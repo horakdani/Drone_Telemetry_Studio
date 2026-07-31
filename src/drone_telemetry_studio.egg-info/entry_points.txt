@@ -1,0 +1,2 @@
+[console_scripts]
+drone-telemetry-studio = drone_telemetry_studio.main:main

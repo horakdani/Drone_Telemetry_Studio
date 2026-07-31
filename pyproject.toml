@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "drone-telemetry-studio"
+version = "0.1.0"
+description = "Helyben futó macOS alkalmazás DJI videók telemetria-overlayéhez"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Drone Telemetry Studio contributors" }]
+dependencies = [
+  "Pillow>=12.0,<13",
+  "PySide6>=6.10,<6.11",
+]
+
+[project.optional-dependencies]
+dev = [
+  "PyInstaller>=6.16,<7",
+  "pytest>=8.4,<10",
+]
+
+[project.scripts]
+drone-telemetry-studio = "drone_telemetry_studio.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-ra"
+

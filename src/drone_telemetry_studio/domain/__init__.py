@@ -1,0 +1,2 @@
+"""GUI-tól független adatmodellek."""
+

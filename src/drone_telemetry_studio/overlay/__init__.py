@@ -1,0 +1,2 @@
+"""Skálázható HUD-kompozíció."""
+

@@ -1,0 +1,42 @@
+1
+00:00:00,000 --> 00:00:00,016
+<font size="28">FrameCnt: 1, DiffTime: 16ms
+2026-07-29 15:38:08.716
+[iso: 140] [shutter: 1/640.0] [fnum: 1.8] [ev: 0] [color_md: default] [focal_len: 24.00] [latitude: 47.452536] [longitude: 19.053074] [rel_alt: 52.300 abs_alt: 96.452] [ct: 5399] </font>
+
+31
+00:00:00,500 --> 00:00:00,516
+<font size="28">FrameCnt: 31, DiffTime: 16ms
+2026-07-29 15:38:09.216
+[iso: 140] [shutter: 1/640.0] [fnum: 1.8] [ev: 0] [focal_len: 24.00] [latitude: 47.452548] [longitude: 19.053100] [rel_alt: 52.800 abs_alt: 96.952] [ct: 5399]</font>
+
+61
+00:00:01,000 --> 00:00:01,016
+FrameCnt: 61, DiffTime: 16ms
+2026-07-29 15:38:09.716
+[iso: 160] [shutter: 1/500.0] [fnum: 1.8] [ev: 0] [latitude: 47.452560] [longitude: 19.053128] [rel_alt: 53.500 abs_alt: 97.652]
+
+91
+00:00:01,500 --> 00:00:01,516
+FrameCnt: 91, DiffTime: 16ms
+2026-07-29 15:38:10.216
+[latitude: 47.452575] [longitude: 19.053160] [rel_alt: 54.100 abs_alt: 98.252]
+
+121
+00:00:02,000 --> 00:00:02,016
+FrameCnt: 121, DiffTime: 16ms
+2026-07-29 15:38:10.716
+[latitude: 47.452590] [longitude: 19.053194] [rel_alt: 54.700 abs_alt: 98.852]
+
+151
+00:00:02,500 --> 00:00:02,516
+FrameCnt: 151, DiffTime: 16ms
+2026-07-29 15:38:11.216
+[latitude: 47.452608] [longitude: 19.053230] [rel_alt: 55.200 abs_alt: 99.352]
+
+181
+00:00:03,000 --> 00:00:03,016
+FrameCnt: 181, DiffTime: 16ms
+2026-07-29 15:38:11.716
+[latitude: 47.452624] [longitude: 19.053264] [rel_alt: 55.500 abs_alt: 99.652]
+
