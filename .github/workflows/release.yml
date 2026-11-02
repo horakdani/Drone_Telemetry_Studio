@@ -1,0 +1,59 @@
+name: Release
+
+# Push a tag like v0.2.0 to build the macOS app and attach it to a GitHub release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    name: Build macOS app (Apple Silicon)
+    runs-on: macos-14
+    timeout-minutes: 30
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install FFmpeg
+        run: brew install ffmpeg
+
+      - name: Install the package
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -e '.[dev]'
+
+      - name: Test and build the .app
+        run: ./scripts/build_macos.sh
+
+      - name: Zip the app bundle
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          [[ "$GITHUB_REF_TYPE" == "tag" ]] || VERSION="dev-${GITHUB_SHA::7}"
+          ARCHIVE="Drone-Telemetry-Studio-${VERSION}-macos-arm64.zip"
+          ditto -c -k --sequesterRsrc --keepParent "dist/Drone Telemetry Studio.app" "$ARCHIVE"
+          echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-app
+          path: ${{ env.ARCHIVE }}
+
+      - name: Publish GitHub release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "$ARCHIVE" \
+            --title "Drone Telemetry Studio $GITHUB_REF_NAME" \
+            --generate-notes \
+            --notes "Unsigned build for Apple Silicon. Requires FFmpeg: \`brew install ffmpeg\`. On first launch, right-click the app and choose **Open** (it is not notarized)."

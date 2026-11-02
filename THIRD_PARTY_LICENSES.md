@@ -1,18 +1,17 @@
-# Külső függőségek és licencek
+# Third-party components and licenses
 
-| Összetevő | Felhasználás | Licenc / megjegyzés |
+| Component | Used for | License / notes |
 |---|---|---|
-| Python | futtatókörnyezet | PSF License |
-| PySide6 / Qt 6 | natív jellegű GUI, szálak | LGPLv3/GPLv3 vagy kereskedelmi; ez a projekt az LGPLv3 feltételeivel számol, nincs Qt-módosítás |
-| Pillow | RGBA HUD és térképrender | HPND történeti licenc |
-| FFmpeg / FFprobe | metaadat, képkocka és MP4 export | LGPLv2.1+ alapesetben; az adott build kapcsolóitól (például GPL libx264) függ, külön telepítendő |
-| libx264 / libx265 | opcionális szoftveres encoder | FFmpeg build/licenc szerint, jellemzően GPL-kompatibilis használatot igényel |
-| Apple VideoToolbox | hardveres encoder | macOS rendszerkomponens |
-| PyInstaller | `.app` csomagolás | GPLv2-or-later külön kivétellel, amely engedi a generált app terjesztését |
-| pytest | csak fejlesztői teszt | MIT |
-| OpenStreetMap adatok/csempék | opcionális háttér | adatok ODbL; © OpenStreetMap contributors; a nyilvános tile szolgáltatás külön használati szabályzata kötelező |
+| Python | Runtime | PSF License |
+| PySide6 / Qt 6 | Native-looking GUI, threading | LGPLv3/GPLv3 or commercial; this project relies on the LGPLv3 terms and does not modify Qt |
+| Pillow | RGBA HUD and map rendering | HPND (historical permission notice) |
+| FFmpeg / FFprobe | Metadata, preview frames and MP4 export | LGPLv2.1+ by default; depends on the build flags (e.g. GPL with libx264); installed separately |
+| libx264 / libx265 | Optional software encoders | Per your FFmpeg build; typically requires GPL-compatible use |
+| Apple VideoToolbox | Hardware encoders | macOS system component |
+| PyInstaller | `.app` packaging | GPLv2-or-later with a bootloader exception that permits distributing the generated app |
+| pytest | Development tests only | MIT |
+| OpenStreetMap data/tiles | Optional map background | Data under ODbL; © OpenStreetMap contributors; the public tile service has its own usage policy, which must be followed |
 
-Az alkalmazás saját csomagja nem tartalmazza az FFmpeg binárist vagy OSM-csempéket.
-Terjesztés előtt az adott FFmpeg build `ffmpeg -version` konfigurációs sorát és az
-LGPL/GPL megfelelést külön ellenőrizni kell.
-
+The application bundle does not ship the FFmpeg binaries or any OSM tiles. Before
+redistributing a build, check the `configuration:` line of `ffmpeg -version` for your
+FFmpeg build and confirm LGPL/GPL compliance separately.

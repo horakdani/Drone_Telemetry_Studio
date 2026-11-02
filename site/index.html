@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drone Telemetry Studio: DJI telemetry overlays for your videos</title>
+<meta name="description" content="Burn DJI drone telemetry (speed, altitude, GPS, heading) and a live route map onto your MP4 videos. Free, open-source, runs 100% locally on macOS.">
+<meta property="og:title" content="Drone Telemetry Studio">
+<meta property="og:description" content="Burn DJI telemetry and a live route map onto your drone videos. Free, local, private.">
+<meta property="og:image" content="https://horakdani.github.io/Telemetry_Overlay/images/social-preview.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%2337e2c4' stroke-width='3'/%3E%3Cpath d='M16 6v20M6 16h20' stroke='%2337e2c4' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b10;
+    --bg-2: #0d141c;
+    --panel: #111b25;
+    --line: #1f2d3a;
+    --text: #e6eef5;
+    --muted: #8da2b5;
+    --accent: #37e2c4;
+    --accent-2: #ffb547;
+    --radius: 14px;
+    --max: 1120px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  img { max-width: 100%; display: block; }
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+
+  /* nav */
+  nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px);
+        background: color-mix(in srgb, var(--bg) 78%, transparent); border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { display: flex; gap: 10px; align-items: center; font-weight: 700; color: var(--text); }
+  .brand svg { width: 26px; height: 26px; }
+  .nav-links { display: flex; gap: 22px; font-size: 14px; }
+  .nav-links a { color: var(--muted); }
+  .nav-links a:hover { color: var(--text); text-decoration: none; }
+  @media (max-width: 720px) { .nav-links a:not(.gh) { display: none; } }
+
+  /* hero */
+  .hero { position: relative; overflow: hidden; padding: 84px 0 56px; text-align: center; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 50% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 48px 48px;
+    mask-image: radial-gradient(70% 70% at 50% 20%, #000 30%, transparent 80%);
+    opacity: .55;
+  }
+  .hero > * { position: relative; }
+  .pill { display: inline-flex; gap: 8px; align-items: center; padding: 6px 14px; border: 1px solid var(--line);
+          border-radius: 999px; font-size: 13px; color: var(--muted); background: var(--bg-2); }
+  .pill b { color: var(--accent); font-weight: 600; }
+  h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.05; letter-spacing: -0.03em; margin: 22px auto 18px; max-width: 900px; font-weight: 800; }
+  h1 .hl { background: linear-gradient(90deg, var(--accent), #7cc7ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: clamp(17px, 2vw, 20px); color: var(--muted); max-width: 700px; margin: 0 auto 32px; }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-flex; gap: 8px; align-items: center; padding: 12px 22px; border-radius: 10px; font-weight: 600;
+         border: 1px solid var(--line); color: var(--text); background: var(--panel); transition: transform .15s, border-color .15s; }
+  .btn:hover { text-decoration: none; transform: translateY(-1px); border-color: var(--muted); }
+  .btn.primary { background: var(--accent); color: #04211c; border-color: var(--accent); }
+  .btn svg { width: 18px; height: 18px; }
+  .demo video { display: block; width: 100%; height: auto; }
+  .caption { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+  .demo { margin: 56px auto 0; max-width: 980px; border-radius: var(--radius); overflow: hidden;
+          border: 1px solid var(--line); box-shadow: 0 30px 80px -20px #000, 0 0 0 1px #ffffff08; background: #000; }
+  .stats { display: flex; justify-content: center; gap: clamp(24px, 6vw, 72px); flex-wrap: wrap; margin-top: 40px; }
+  .stat { text-align: center; }
+  .stat .v { font: 700 26px "JetBrains Mono", monospace; color: var(--text); }
+  .stat .k { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+  section { padding: 88px 0; }
+  section.alt { background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .eyebrow { font: 700 12px "JetBrains Mono", monospace; color: var(--accent); letter-spacing: .16em; text-transform: uppercase; }
+  h2 { font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.02em; margin: 10px 0 14px; line-height: 1.15; }
+  .sub { color: var(--muted); max-width: 640px; margin: 0 0 44px; }
+
+  /* features */
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .card .ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 14px;
+              background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+  .card .ic svg { width: 22px; height: 22px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* showcase */
+  .split { display: grid; gap: 40px; grid-template-columns: 1fr 1.25fr; align-items: center; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+  .shot { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); box-shadow: 0 20px 60px -24px #000; }
+  ul.check { list-style: none; padding: 0; margin: 0; }
+  ul.check li { padding-left: 30px; position: relative; margin: 10px 0; color: var(--muted); }
+  ul.check li b { color: var(--text); font-weight: 600; }
+  ul.check li::before { content: ""; position: absolute; left: 0; top: 5px; width: 18px; height: 18px; border-radius: 50%;
+    background: color-mix(in srgb, var(--accent) 18%, transparent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2337e2c4' stroke-width='3'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/12px no-repeat; }
+
+  /* pipeline */
+  .steps { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); counter-reset: s; }
+  .step { position: relative; padding: 22px; border: 1px dashed var(--line); border-radius: var(--radius); }
+  .step::before { counter-increment: s; content: "0" counter(s); font: 700 13px "JetBrains Mono", monospace; color: var(--accent-2); }
+  .step h3 { margin: 8px 0 6px; font-size: 16px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  /* install */
+  pre { background: #05080c; border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; overflow-x: auto;
+        font: 14px/1.7 "JetBrains Mono", monospace; color: #cfe3f1; margin: 0; }
+  pre .c { color: #5d7488; }
+  .tabs { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+  .tabs > div, .grid > *, .steps > *, .split > * { min-width: 0; }
+  .tabs h3 { margin: 0 0 10px; font-size: 16px; }
+  .note { margin-top: 14px; color: var(--muted); font-size: 14px; }
+
+  /* faq */
+  details { border-bottom: 1px solid var(--line); padding: 18px 0; }
+  summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  summary::after { content: "+"; color: var(--accent); font: 700 20px "JetBrains Mono", monospace; line-height: 1; }
+  details[open] summary::after { content: "–"; }
+  details p { color: var(--muted); margin: 10px 0 0; }
+
+  footer { padding: 40px 0 56px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="13" stroke="#37e2c4"/><path d="M16 5v6M16 21v6M5 16h6M21 16h6" stroke="#37e2c4"/><circle cx="16" cy="16" r="2.5" fill="#ffb547" stroke="none"/></svg>
+      Drone Telemetry Studio
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a class="gh" href="https://github.com/horakdani/Telemetry_Overlay">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="pill"><b>Free &amp; open source</b> · macOS · 100% local</span>
+    <h1>Turn your DJI flight data into a <span class="hl">cinematic HUD</span></h1>
+    <p class="lead">Drone Telemetry Studio reads the <code>.SRT</code> file your DJI drone records next to every video and burns speed, altitude, GPS, heading and a live route map onto a new MP4. Your footage never leaves your Mac.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/horakdani/Telemetry_Overlay/releases/latest">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 4v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg>
+        Download for macOS
+      </a>
+      <a class="btn" href="https://github.com/horakdani/Telemetry_Overlay">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 00-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.7 18.3 5 18.3 5c.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0012 .5z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+    <div class="demo">
+      <video autoplay muted loop playsinline poster="images/hud-preview.png" width="1280" height="720" aria-label="Demo: telemetry HUD and route map overlaid on a video">
+        <source src="images/demo.mp4" type="video/mp4">
+        <img src="images/demo.gif" alt="Animated demo: telemetry HUD and route map overlaid on a video">
+      </video>
+    </div>
+    <p class="caption">Demo rendered from a synthetic flight along the Danube in Budapest · sped up 8×</p>
+    <div class="stats">
+      <div class="stat"><div class="v">0 bytes</div><div class="k">uploaded</div></div>
+      <div class="stat"><div class="v">4K</div><div class="k">native resolution</div></div>
+      <div class="stat"><div class="v">1 pass</div><div class="k">FFmpeg export</div></div>
+      <div class="stat"><div class="v">MIT</div><div class="k">license</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <div class="eyebrow">Features</div>
+    <h2>Everything you need for a telemetry overlay. Nothing you don't.</h2>
+    <p class="sub">Built for pilots who want their flight data in the shot without paying for a subscription, uploading gigabytes, or fighting a video editor.</p>
+    <div class="grid">
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18a8 8 0 1116 0"/><path d="M12 18l4-6"/></svg></div><h3>Accurate motion data</h3><p>Haversine distance over ≥0.5 s windows, GPS-jump rejection and time-based smoothing give a speed readout you can trust.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></div><h3>Live route map</h3><p>A fixed mini-map frames the whole flight: full path, path so far, start point, drone marker and a north arrow. OpenStreetMap background or fully offline cinematic style.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15h18"/><path d="M8 19v-4"/></svg></div><h3>Frame-accurate preview</h3><p>Scrub the timeline and see the real video frame with the HUD on top. Nudge the telemetry sync by ±0.01 s until it lines up perfectly.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div><h3>Hardware encoding</h3><p>Detects <code>h264_videotoolbox</code> and <code>hevc_videotoolbox</code> on Apple Silicon, with <code>libx264</code> / <code>libx265</code> as software fallbacks.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div><h3>Private by design</h3><p>No account, no cloud, no telemetry about you. The only optional network use is map tiles, and one toggle turns that off.</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Never touches originals</h3><p>Exports always go to a new file. Cancelling stops FFmpeg cleanly and deletes the partial output. Audio and VFR timestamps are preserved.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow">The app</div>
+      <h2>Pick a video. Tweak. Export.</h2>
+      <p class="sub" style="margin-bottom:24px">The SRT next to your MP4 is paired automatically by file name. Every setting previews instantly.</p>
+      <ul class="check">
+        <li><b>Toggle any field:</b> speed, altitude, GPS, date, time, heading, vertical speed, distance</li>
+        <li><b>Map controls:</b> corner, dark / light / cinematic style, hide at start or end</li>
+        <li><b>Validation report:</b> FPS, VFR, duration, audio track and GPS warnings up front</li>
+        <li><b>Progress and ETA</b> while exporting, with one-click cancel</li>
+      </ul>
+    </div>
+    <div class="shot"><img src="images/app-window.png" alt="Drone Telemetry Studio main window" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2>One FFmpeg pass. No giant temp files.</h2>
+    <p class="sub">Instead of rendering a transparent intermediate video, the HUD is streamed as raw RGBA frames straight into the same FFmpeg process that encodes your output.</p>
+    <div class="steps">
+      <div class="step"><h3>Parse</h3><p>A tolerant, block-by-block DJI SRT parser handles BOMs, optional fields and malformed blocks.</p></div>
+      <div class="step"><h3>Compute</h3><p>Speed, heading, vertical speed and distance in SI units, with outlier rejection and smoothing.</p></div>
+      <div class="step"><h3>Render</h3><p>Pillow draws a 960×540 HUD + route map at 10 fps, independent of the video frame rate.</p></div>
+      <div class="step"><h3>Compose</h3><p>FFmpeg upscales the HUD with Lanczos and overlays it on the original 1080p/4K stream in a single pass.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="install" class="alt">
+  <div class="wrap">
+    <div class="eyebrow">Get started</div>
+    <h2>Install in a minute</h2>
+    <p class="sub">Requires macOS 13+ (Apple Silicon recommended) and FFmpeg from Homebrew.</p>
+    <div class="tabs">
+      <div>
+        <h3>Download the app</h3>
+<pre><span class="c"># 1. Install FFmpeg</span>
+brew install ffmpeg
+
+<span class="c"># 2. Download the latest release, unzip,</span>
+<span class="c">#    right-click the app → Open</span></pre>
+        <p class="note">Builds are not notarized yet, so macOS asks for confirmation on first launch.</p>
+      </div>
+      <div>
+        <h3>Run from source</h3>
+<pre>brew install python ffmpeg
+git clone https://github.com/horakdani/Telemetry_Overlay.git
+cd Telemetry_Overlay
+python3 -m venv .venv
+.venv/bin/pip install -e '.[dev]'
+./scripts/run_dev.sh</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap" style="max-width:820px">
+    <div class="eyebrow">FAQ</div>
+    <h2>Questions</h2>
+    <details><summary>Where do I find the SRT file?</summary><p>Enable <em>Video Subtitles</em> (sometimes called <em>Video Caption</em>) in the DJI Fly or DJI Pilot camera settings. The drone then writes a <code>.SRT</code> with the same name next to each <code>.MP4</code> on the SD card.</p></details>
+    <details><summary>Which drones are supported?</summary><p>DJI drones that write the bracketed SRT format with <code>[latitude: …] [longitude: …] [rel_alt: …]</code> fields, as recorded by recent DJI Fly models. Older layouts such as <code>GPS(lon, lat, alt)</code> aren't supported yet. If your file doesn't parse, <a href="https://github.com/horakdani/Telemetry_Overlay/issues/new?template=srt_format.yml">open an issue</a> with a few SRT blocks so it can be added.</p></details>
+    <details><summary>Is anything uploaded?</summary><p>No. Video and telemetry are processed locally. With the OpenStreetMap background enabled, only the map tiles for your flight's bounding box are downloaded and cached. Switch to the offline map style to make zero network requests.</p></details>
+    <details><summary>Does it work on Windows or Linux?</summary><p>The core is plain Python + Qt + FFmpeg, so it largely runs elsewhere, but only macOS is tested and packaged today. Contributions are welcome.</p></details>
+    <details><summary>Will it re-encode my video?</summary><p>Yes, because burning in an overlay requires re-encoding. You choose the encoder (hardware or software) and quality. The original audio is copied without re-encoding.</p></details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© Drone Telemetry Studio contributors · MIT License</span>
+    <span>Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> · Not affiliated with DJI</span>
+  </div>
+</footer>
+</body>
+</html>
