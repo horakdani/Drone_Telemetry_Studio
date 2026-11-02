@@ -7,7 +7,7 @@
 <meta name="description" content="Burn DJI drone telemetry (speed, altitude, GPS, heading) and a live route map onto your MP4 videos. Free, open-source, runs 100% locally on macOS.">
 <meta property="og:title" content="Drone Telemetry Studio">
 <meta property="og:description" content="Burn DJI telemetry and a live route map onto your drone videos. Free, local, private.">
-<meta property="og:image" content="https://horakdani.github.io/Telemetry_Overlay/images/social-preview.png">
+<meta property="og:image" content="https://horakdani.github.io/Drone_Telemetry_Studio/images/social-preview.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='none' stroke='%2337e2c4' stroke-width='3'/%3E%3Cpath d='M16 6v20M6 16h20' stroke='%2337e2c4' stroke-width='2'/%3E%3C/svg%3E">
@@ -149,7 +149,7 @@
       <a href="#how">How it works</a>
       <a href="#install">Install</a>
       <a href="#faq">FAQ</a>
-      <a class="gh" href="https://github.com/horakdani/Telemetry_Overlay">GitHub ↗</a>
+      <a class="gh" href="https://github.com/horakdani/Drone_Telemetry_Studio">GitHub ↗</a>
     </div>
   </div>
 </nav>
@@ -160,11 +160,11 @@
     <h1>Turn your DJI flight data into a <span class="hl">cinematic HUD</span></h1>
     <p class="lead">Drone Telemetry Studio reads the <code>.SRT</code> file your DJI drone records next to every video and burns speed, altitude, GPS, heading and a live route map onto a new MP4. Your footage never leaves your Mac.</p>
     <div class="cta">
-      <a class="btn primary" href="https://github.com/horakdani/Telemetry_Overlay/releases/latest">
+      <a class="btn primary" href="https://github.com/horakdani/Drone_Telemetry_Studio/releases/latest">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 4v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg>
         Download for macOS
       </a>
-      <a class="btn" href="https://github.com/horakdani/Telemetry_Overlay">
+      <a class="btn" href="https://github.com/horakdani/Drone_Telemetry_Studio">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 00-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 4.7 18.3 5 18.3 5c.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0012 .5z"/></svg>
         View on GitHub
       </a>
@@ -250,8 +250,8 @@ brew install ffmpeg
       <div>
         <h3>Run from source</h3>
 <pre>brew install python ffmpeg
-git clone https://github.com/horakdani/Telemetry_Overlay.git
-cd Telemetry_Overlay
+git clone https://github.com/horakdani/Drone_Telemetry_Studio.git
+cd Drone_Telemetry_Studio
 python3 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
 ./scripts/run_dev.sh</pre>
@@ -265,7 +265,7 @@ python3 -m venv .venv
     <div class="eyebrow">FAQ</div>
     <h2>Questions</h2>
     <details><summary>Where do I find the SRT file?</summary><p>Enable <em>Video Subtitles</em> (sometimes called <em>Video Caption</em>) in the DJI Fly or DJI Pilot camera settings. The drone then writes a <code>.SRT</code> with the same name next to each <code>.MP4</code> on the SD card.</p></details>
-    <details><summary>Which drones are supported?</summary><p>DJI drones that write the bracketed SRT format with <code>[latitude: …] [longitude: …] [rel_alt: …]</code> fields, as recorded by recent DJI Fly models. Older layouts such as <code>GPS(lon, lat, alt)</code> aren't supported yet. If your file doesn't parse, <a href="https://github.com/horakdani/Telemetry_Overlay/issues/new?template=srt_format.yml">open an issue</a> with a few SRT blocks so it can be added.</p></details>
+    <details><summary>Which drones are supported?</summary><p>DJI drones that write the bracketed SRT format with <code>[latitude: …] [longitude: …] [rel_alt: …]</code> fields, as recorded by recent DJI Fly models. Older layouts such as <code>GPS(lon, lat, alt)</code> aren't supported yet. If your file doesn't parse, <a href="https://github.com/horakdani/Drone_Telemetry_Studio/issues/new?template=srt_format.yml">open an issue</a> with a few SRT blocks so it can be added.</p></details>
     <details><summary>Is anything uploaded?</summary><p>No. Video and telemetry are processed locally. With the OpenStreetMap background enabled, only the map tiles for your flight's bounding box are downloaded and cached. Switch to the offline map style to make zero network requests.</p></details>
     <details><summary>Does it work on Windows or Linux?</summary><p>The core is plain Python + Qt + FFmpeg, so it largely runs elsewhere, but only macOS is tested and packaged today. Contributions are welcome.</p></details>
     <details><summary>Will it re-encode my video?</summary><p>Yes, because burning in an overlay requires re-encoding. You choose the encoder (hardware or software) and quality. The original audio is copied without re-encoding.</p></details>

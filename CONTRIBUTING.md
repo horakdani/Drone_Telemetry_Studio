@@ -7,8 +7,8 @@ requests are all welcome.
 
 ```bash
 brew install python ffmpeg
-git clone https://github.com/horakdani/Telemetry_Overlay.git
-cd Telemetry_Overlay
+git clone https://github.com/horakdani/Drone_Telemetry_Studio.git
+cd Drone_Telemetry_Studio
 python3 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
 ./scripts/verify_environment.sh   # checks Python, PySide6, Pillow, FFmpeg

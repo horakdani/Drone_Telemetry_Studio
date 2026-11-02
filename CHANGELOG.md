@@ -38,6 +38,6 @@ All notable changes to this project are documented here. The format follows
 - First working release: DJI SRT parser, telemetry calculations, offline route map,
   HUD preview, cancellable FFmpeg export and a PySide6 desktop UI.
 
-[Unreleased]: https://github.com/horakdani/Telemetry_Overlay/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/horakdani/Telemetry_Overlay/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/horakdani/Telemetry_Overlay/releases/tag/v0.1.0
+[Unreleased]: https://github.com/horakdani/Drone_Telemetry_Studio/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/horakdani/Drone_Telemetry_Studio/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/horakdani/Drone_Telemetry_Studio/releases/tag/v0.1.0

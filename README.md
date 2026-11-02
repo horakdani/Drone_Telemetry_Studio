@@ -7,15 +7,15 @@
 **Burn your DJI flight data (speed, altitude, GPS, heading) and a live route map onto your drone videos.**<br>
 Free, open source, and 100% local. Your footage never leaves your Mac.
 
-[![CI](https://github.com/horakdani/Telemetry_Overlay/actions/workflows/ci.yml/badge.svg)](https://github.com/horakdani/Telemetry_Overlay/actions/workflows/ci.yml)
+[![CI](https://github.com/horakdani/Drone_Telemetry_Studio/actions/workflows/ci.yml/badge.svg)](https://github.com/horakdani/Drone_Telemetry_Studio/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-37e2c4.svg)](LICENSE)
 ![Platform: macOS](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey?logo=apple)
 ![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776AB?logo=python&logoColor=white)
 ![Qt for Python](https://img.shields.io/badge/UI-PySide6-41CD52?logo=qt&logoColor=white)
 ![FFmpeg](https://img.shields.io/badge/powered%20by-FFmpeg-007808?logo=ffmpeg&logoColor=white)
 
-[**Website**](https://horakdani.github.io/Telemetry_Overlay/) ·
-[**Download**](https://github.com/horakdani/Telemetry_Overlay/releases/latest) ·
+[**Website**](https://horakdani.github.io/Drone_Telemetry_Studio/) ·
+[**Download**](https://github.com/horakdani/Drone_Telemetry_Studio/releases/latest) ·
 [Quick start](#-quick-start) ·
 [How it works](#-how-it-works) ·
 [FAQ](#-faq)
@@ -60,15 +60,15 @@ is untested), and [FFmpeg](https://ffmpeg.org/) via [Homebrew](https://brew.sh/)
 brew install ffmpeg
 ```
 
-Then grab the latest `.zip` from **[Releases](https://github.com/horakdani/Telemetry_Overlay/releases/latest)**,
+Then grab the latest `.zip` from **[Releases](https://github.com/horakdani/Drone_Telemetry_Studio/releases/latest)**,
 unzip it, and **right-click → Open** the first time (the build isn't notarized yet).
 
 ### Option B: run from source
 
 ```bash
 brew install python ffmpeg
-git clone https://github.com/horakdani/Telemetry_Overlay.git
-cd Telemetry_Overlay
+git clone https://github.com/horakdani/Drone_Telemetry_Studio.git
+cd Drone_Telemetry_Studio
 python3 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
 ./scripts/verify_environment.sh
@@ -178,7 +178,7 @@ src/drone_telemetry_studio/
 DJI drones that write the bracketed SRT format, e.g.
 `[latitude: 47.45] [longitude: 19.05] [rel_alt: 52.3 abs_alt: 96.4]`, as recorded by
 recent DJI Fly models. Older layouts such as `GPS(lon, lat, alt)` aren't supported yet.
-[Open an SRT format issue](https://github.com/horakdani/Telemetry_Overlay/issues/new?template=srt_format.yml)
+[Open an SRT format issue](https://github.com/horakdani/Drone_Telemetry_Studio/issues/new?template=srt_format.yml)
 with a few blocks and it can be added.
 </details>
 
@@ -202,7 +202,7 @@ the original audio track is copied as-is.
 - [ ] HUD themes and custom fonts
 - [ ] Batch export
 
-Ideas and votes are welcome in [Issues](https://github.com/horakdani/Telemetry_Overlay/issues).
+Ideas and votes are welcome in [Issues](https://github.com/horakdani/Drone_Telemetry_Studio/issues).
 
 ## ⚠️ Known limitations
 
