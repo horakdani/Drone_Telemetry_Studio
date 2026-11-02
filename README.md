@@ -21,7 +21,7 @@ Free, open source, and 100% local. Your footage never leaves your Mac.
 [FAQ](#-faq)
 
 <img src="docs/images/demo.gif" alt="Animated demo: telemetry HUD and route map overlaid on a video" width="860"><br>
-<sub>Synthetic demo flight along the Danube in Budapest, sped up 8×. Map © OpenStreetMap contributors.</sub>
+<sub>Rendered with the real export pipeline: computer-generated dusk flyover + synthetic telemetry along the Danube in Budapest, sped up 8×. Map © OpenStreetMap contributors.</sub>
 
 </div>
 
@@ -137,7 +137,7 @@ QT_QPA_PLATFORM=offscreen PYTHONPATH=src .venv/bin/python scripts/capture_gui_sc
 The README and website media are reproducible too:
 
 ```bash
-PYTHONPATH=src .venv/bin/python scripts/generate_showcase.py       # demo.gif, demo.mp4, hud-preview.png
+PYTHONPATH=src .venv/bin/python scripts/generate_showcase.py       # flyover clip → demo.gif, demo.mp4, hud-preview.png
 PYTHONPATH=src .venv/bin/python scripts/generate_brand_assets.py   # logo.png, social-preview.png
 ```
 

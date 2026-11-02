@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- The showcase demo is now an animated, procedurally rendered dusk flyover that
+  moves and climbs with the telemetry, instead of a static gradient.
+
 ## [0.2.0] – 2026-11-02
 
 ### Fixed
