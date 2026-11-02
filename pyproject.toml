@@ -28,10 +28,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://horakdani.github.io/Telemetry_Overlay/"
-Repository = "https://github.com/horakdani/Telemetry_Overlay"
-Issues = "https://github.com/horakdani/Telemetry_Overlay/issues"
-Changelog = "https://github.com/horakdani/Telemetry_Overlay/blob/main/CHANGELOG.md"
+Homepage = "https://horakdani.github.io/Drone_Telemetry_Studio/"
+Repository = "https://github.com/horakdani/Drone_Telemetry_Studio"
+Issues = "https://github.com/horakdani/Drone_Telemetry_Studio/issues"
+Changelog = "https://github.com/horakdani/Drone_Telemetry_Studio/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [

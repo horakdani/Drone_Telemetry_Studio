@@ -7,7 +7,7 @@ for the map background, and you can turn those off.
 ## Reporting a vulnerability
 
 Please **do not** open a public issue for security problems. Use GitHub's
-[private vulnerability reporting](https://github.com/horakdani/Telemetry_Overlay/security/advisories/new)
+[private vulnerability reporting](https://github.com/horakdani/Drone_Telemetry_Studio/security/advisories/new)
 instead, with steps to reproduce and the version you tested.
 
 Relevant areas include:
