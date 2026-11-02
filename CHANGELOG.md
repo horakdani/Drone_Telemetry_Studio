@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] – 2026-11-02
+
 ### Fixed
 - The route on the OpenStreetMap background was misplaced whenever the flight's
   bounding box had a different aspect ratio from the map panel; the offline route
@@ -32,5 +34,6 @@ All notable changes to this project are documented here. The format follows
 - First working release: DJI SRT parser, telemetry calculations, offline route map,
   HUD preview, cancellable FFmpeg export and a PySide6 desktop UI.
 
-[Unreleased]: https://github.com/horakdani/Telemetry_Overlay/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/horakdani/Telemetry_Overlay/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/horakdani/Telemetry_Overlay/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/horakdani/Telemetry_Overlay/releases/tag/v0.1.0

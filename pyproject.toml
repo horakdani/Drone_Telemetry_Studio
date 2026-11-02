@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "drone-telemetry-studio"
-version = "0.1.0"
+version = "0.2.0"
 description = "Burn DJI drone telemetry (speed, altitude, GPS, heading) and a live route map onto your MP4 videos. Free, local, private macOS app."
 readme = "README.md"
 requires-python = ">=3.12"
