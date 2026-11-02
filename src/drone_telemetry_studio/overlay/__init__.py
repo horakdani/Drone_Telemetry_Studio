@@ -1,2 +1,2 @@
-"""Skálázható HUD-kompozíció."""
+"""Scalable HUD composition."""
 

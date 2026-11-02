@@ -41,10 +41,10 @@ class ExportResult:
 
 def _quality_arguments(codec: str, quality: str) -> list[str]:
     if codec in {"h264_videotoolbox", "hevc_videotoolbox"}:
-        bitrate = {"Gyors": "10M", "Kiegyensúlyozott": "18M", "Kiváló": "30M"}[quality]
+        bitrate = {"Fast": "10M", "Balanced": "18M", "High": "30M"}[quality]
         return ["-b:v", bitrate, "-allow_sw", "1"]
-    crf = {"Gyors": "25", "Kiegyensúlyozott": "21", "Kiváló": "18"}[quality]
-    preset = {"Gyors": "veryfast", "Kiegyensúlyozott": "medium", "Kiváló": "slow"}[quality]
+    crf = {"Fast": "25", "Balanced": "21", "High": "18"}[quality]
+    preset = {"Fast": "veryfast", "Balanced": "medium", "High": "slow"}[quality]
     return ["-crf", crf, "-preset", preset]
 
 
@@ -55,7 +55,7 @@ def build_export_command(
     metadata: VideoMetadata,
     config: ExportConfig,
 ) -> list[str]:
-    """Argumentumlista; sem shell, sem felhasználói útvonal-interpoláció nincs."""
+    """Argument list; no shell and no interpolation of user paths."""
     command = [
         ffmpeg_path,
         "-hide_banner",
@@ -123,13 +123,13 @@ class ExportPipeline:
     ) -> ExportResult:
         source, output = Path(input_path).resolve(), Path(output_path).resolve()
         if source == output:
-            raise ValueError("Az eredeti videó nem írható felül.")
+            raise ValueError("The original video cannot be overwritten.")
         if output.exists():
-            raise FileExistsError("A kimeneti fájl már létezik; válassz új nevet.")
+            raise FileExistsError("The output file already exists; choose a new name.")
         output.parent.mkdir(parents=True, exist_ok=True)
         temporary = output.with_name(f".{output.stem}.{uuid.uuid4().hex}.part.mp4")
         command = build_export_command(self.ffmpeg_path, source, temporary, metadata, export_config)
-        LOGGER.info("Export indul: input=%s output=%s codec=%s", source.name, output.name, export_config.codec)
+        LOGGER.info("Export starting: input=%s output=%s codec=%s", source.name, output.name, export_config.codec)
         started = time.monotonic()
         stderr_tail: list[str] = []
         latest_media_time = [0.0]
@@ -199,17 +199,17 @@ class ExportPipeline:
             stop_reader.set()
             reader.join(timeout=2)
             if cancel_event and cancel_event.is_set():
-                raise ExportCancelled("Az exportot a felhasználó megszakította.")
+                raise ExportCancelled("Export was cancelled by the user.")
             if return_code != 0:
                 detail = "\n".join(stderr_tail[-20:])
-                raise RuntimeError(f"Az FFmpeg export sikertelen.\n{detail}")
+                raise RuntimeError(f"FFmpeg export failed.\n{detail}")
             if not temporary.exists() or temporary.stat().st_size == 0:
-                raise RuntimeError("Az FFmpeg nem hozott létre lejátszható kimenetet.")
+                raise RuntimeError("FFmpeg did not produce a playable output.")
             os.replace(temporary, output)
             elapsed = time.monotonic() - started
             if progress_callback:
                 progress_callback(ExportProgress(1.0, elapsed, 0.0))
-            LOGGER.info("Export kész: %s, %.2f s", output.name, elapsed)
+            LOGGER.info("Export finished: %s, %.2f s", output.name, elapsed)
             return ExportResult(output, elapsed, rendered)
         finally:
             stop_reader.set()

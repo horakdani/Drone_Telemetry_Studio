@@ -10,7 +10,7 @@ from drone_telemetry_studio.map.geometry import GeoBounds, mercator_world_pixel
 
 
 class RasterTileProvider:
-    """Csak az egyetlen aktuális fix nézet csempéit kéri le; nincs előtöltés."""
+    """Fetches tiles only for the single current static view; no prefetching."""
 
     def __init__(self, cache: TileCache, url_template: str) -> None:
         self.cache = cache

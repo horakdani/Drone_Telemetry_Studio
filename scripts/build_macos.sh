@@ -5,8 +5,8 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
 if [[ ! -x .venv/bin/python ]] || [[ ! -x .venv/bin/pyinstaller ]]; then
-  echo "Hiányzik a fejlesztői .venv vagy a PyInstaller."
-  echo "Telepítés: python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'"
+  echo "The development .venv or PyInstaller is missing."
+  echo "Install: python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'"
   exit 1
 fi
 
@@ -22,5 +22,5 @@ export PYINSTALLER_CONFIG_DIR="$PROJECT_DIR/.pyinstaller"
   --paths "$PROJECT_DIR/src" \
   "$PROJECT_DIR/src/drone_telemetry_studio/main.py"
 
-echo "Elkészült: $PROJECT_DIR/dist/Drone Telemetry Studio.app"
-echo "Az FFmpeg licenc- és méretokból nincs az appba csomagolva; telepítsd: brew install ffmpeg"
+echo "Built: $PROJECT_DIR/dist/Drone Telemetry Studio.app"
+echo "FFmpeg is not bundled into the app for licensing and size reasons; install it with: brew install ffmpeg"

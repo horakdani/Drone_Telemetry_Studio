@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 class ValidityFlag(IntFlag):
-    """Az egyes mintaértékek érvényességét bitenként tárolja."""
+    """Stores the validity of individual sample values as bit flags."""
 
     NONE = 0
     TIME = auto()

@@ -22,7 +22,7 @@ def _wait_for(app: QApplication, condition, timeout: float = 15.0) -> None:
     while not condition() and time.monotonic() < deadline:
         app.processEvents()
         time.sleep(0.01)
-    assert condition(), "A GUI háttérfeladata túllépte az időkorlátot."
+    assert condition(), "The GUI background task timed out."
 
 
 def test_gui_preview_and_export_flow(tmp_path: Path, monkeypatch) -> None:
@@ -58,7 +58,7 @@ def test_gui_preview_and_export_flow(tmp_path: Path, monkeypatch) -> None:
     software_index = window.codec.findData("libx264")
     assert software_index >= 0
     window.codec.setCurrentIndex(software_index)
-    window.quality.setCurrentText("Gyors")
+    window.quality.setCurrentText("Fast")
     window._start_export()
     _wait_for(app, lambda: window._export_worker is None, timeout=30)
     assert output.exists()

@@ -50,7 +50,7 @@ def test_probe_and_overlay_export_preserves_audio(tmp_path: Path) -> None:
         metadata,
         demo_samples(),
         OverlayConfig(),
-        ExportConfig(overlay_fps=5, overlay_width=320, overlay_height=180, quality="Gyors"),
+        ExportConfig(overlay_fps=5, overlay_width=320, overlay_height=180, quality="Fast"),
         progress_callback=progress.append,
     )
     exported = probe_video(result.output_path)
@@ -73,7 +73,7 @@ def test_cancelled_export_cleans_temporary_file(tmp_path: Path) -> None:
             probe_video(source),
             demo_samples(),
             OverlayConfig(),
-            ExportConfig(overlay_fps=2, overlay_width=160, overlay_height=90, quality="Gyors"),
+            ExportConfig(overlay_fps=2, overlay_width=160, overlay_height=90, quality="Fast"),
             cancel_event=cancel,
         )
     assert not output.exists()

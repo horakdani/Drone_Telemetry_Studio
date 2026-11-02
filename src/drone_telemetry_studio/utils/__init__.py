@@ -1,2 +1,2 @@
-"""Naplózás és alkalmazásszintű segédek."""
+"""Logging and application-level helpers."""
 

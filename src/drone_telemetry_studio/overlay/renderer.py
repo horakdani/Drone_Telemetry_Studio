@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from drone_telemetry_studio.domain.overlay import Corner, OverlayConfig
 from drone_telemetry_studio.domain.telemetry import TelemetrySample
 from drone_telemetry_studio.map.renderer import StaticMapRenderer
-from drone_telemetry_studio.telemetry.geo import hungarian_compass
+from drone_telemetry_studio.telemetry.geo import compass_direction
 
 
 def _font(size: int, bold: bool = False):
@@ -22,11 +22,11 @@ def _font(size: int, bold: bool = False):
 
 
 def _number(value: float | None, digits: int = 1) -> str:
-    return "–" if value is None else f"{value:.{digits}f}".replace(".", ",")
+    return "–" if value is None else f"{value:.{digits}f}"
 
 
 class HudRenderer:
-    """A teljes videótól független, átlátszó HUD-képet készít."""
+    """Renders a transparent HUD image independent of the full video."""
 
     def __init__(self, map_renderer: StaticMapRenderer | None = None) -> None:
         self.map_renderer = map_renderer or StaticMapRenderer()
@@ -60,17 +60,17 @@ class HudRenderer:
         y = margin
         if config.show_speed:
             speed = _number(sample.calculated_speed_kmh)
-            y = self._panel(draw, margin, y, radius, panel_fill, "SEBESSÉG", f"{speed} km/h", label_font, value_font, panel_padding_x, panel_padding_y, text_gap)
+            y = self._panel(draw, margin, y, radius, panel_fill, "SPEED", f"{speed} km/h", label_font, value_font, panel_padding_x, panel_padding_y, text_gap)
         if config.show_altitude:
-            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "MAGASSÁG", f"{_number(sample.relative_altitude_m)} m", label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
+            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "ALT", f"{_number(sample.relative_altitude_m)} m", label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
         if config.show_heading:
             heading = sample.calculated_heading_deg
-            text = "–" if heading is None else f"{heading:03.0f}° {hungarian_compass(heading)}"
-            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "IRÁNY", text, label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
+            text = "–" if heading is None else f"{heading:03.0f}° {compass_direction(heading)}"
+            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "HDG", text, label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
         if config.show_vertical_speed:
-            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "FÜGGŐLEGES", f"{_number(sample.calculated_vertical_speed_mps)} m/s", label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
+            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "V/S", f"{_number(sample.calculated_vertical_speed_mps)} m/s", label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
         if config.show_distance:
-            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "TÁVOLSÁG", f"{_number(sample.cumulative_distance_m, 0)} m", label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
+            y = self._panel(draw, margin, y + panel_gap, radius, panel_fill, "DIST", f"{_number(sample.cumulative_distance_m, 0)} m", label_font, small_font, panel_padding_x, panel_padding_y, text_gap)
 
         bottom_lines = []
         if config.show_gps and sample.latitude is not None and sample.longitude is not None and config.gps_decimals > 0:
@@ -78,7 +78,7 @@ class HudRenderer:
         if sample.recorded_at:
             parts = []
             if config.show_date:
-                parts.append(sample.recorded_at.strftime("%Y. %m. %d."))
+                parts.append(sample.recorded_at.strftime("%Y-%m-%d"))
             if config.show_time:
                 parts.append(sample.recorded_at.strftime("%H:%M:%S"))
             if parts:

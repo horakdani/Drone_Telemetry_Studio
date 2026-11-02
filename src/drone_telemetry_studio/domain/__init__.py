@@ -1,2 +1,2 @@
-"""GUI-tól független adatmodellek."""
+"""GUI-independent data models."""
 

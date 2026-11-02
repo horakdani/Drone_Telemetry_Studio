@@ -1,2 +1,2 @@
-"""DJI telemetriafájlok beolvasói."""
+"""Readers for DJI telemetry files."""
 

@@ -27,8 +27,8 @@ def main() -> None:
         "pillow_external_runtime": False,
         "maplibre_playwright_installed": playwright_available,
         "headless_chromium_on_path": chromium_available,
-        "decision": "Pillow statikus renderer",
-        "reason": "nincs böngésző-runtime, kisebb csomag, determinisztikus offline útvonalnézet",
+        "decision": "Pillow static renderer",
+        "reason": "no browser runtime, smaller bundle, deterministic offline route view",
     }
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

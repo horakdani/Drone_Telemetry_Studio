@@ -1,2 +1,2 @@
-"""Magyar Qt Widgets felhasználói felület."""
+"""Qt Widgets user interface."""
 

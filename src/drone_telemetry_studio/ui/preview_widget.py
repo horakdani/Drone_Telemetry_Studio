@@ -11,7 +11,7 @@ class PreviewWidget(QWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._source: QPixmap | None = None
-        self.label = QLabel("Válassz egy MP4-videót és egy DJI SRT-fájlt.")
+        self.label = QLabel("Choose an MP4 video and a DJI SRT file.")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.label.setMinimumSize(640, 360)
         self.label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)

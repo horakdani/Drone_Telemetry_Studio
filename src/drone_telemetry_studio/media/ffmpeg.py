@@ -19,7 +19,7 @@ def discover_media_tools() -> MediaTools:
         found = shutil.which(name)
         if found:
             return found
-        # Finderből indított .app nem örökli a Homebrew shell PATH-ját.
+        # An .app launched from Finder does not inherit the Homebrew shell PATH.
         for directory in (Path("/opt/homebrew/bin"), Path("/usr/local/bin"), Path("/usr/bin")):
             candidate = directory / name
             if candidate.is_file() and candidate.stat().st_mode & 0o111:
@@ -30,7 +30,7 @@ def discover_media_tools() -> MediaTools:
     ffprobe = locate("ffprobe")
     if not ffmpeg or not ffprobe:
         raise RuntimeError(
-            "Az FFmpeg vagy az FFprobe nem található. Telepítés macOS alatt: brew install ffmpeg"
+            "FFmpeg or FFprobe was not found. Install on macOS with: brew install ffmpeg"
         )
     return MediaTools(ffmpeg, ffprobe)
 
@@ -59,7 +59,7 @@ def extract_preview_frame(
     max_width: int = 1280,
     ffmpeg_path: str | None = None,
 ) -> Image.Image:
-    """Egyetlen proxy-képkockát kér az FFmpegtől; a videó sosem kerül memóriába."""
+    """Requests a single proxy frame from FFmpeg; the video is never loaded into memory."""
     executable = ffmpeg_path or discover_media_tools().ffmpeg
     command = [
         executable,
@@ -83,7 +83,7 @@ def extract_preview_frame(
     completed = subprocess.run(command, capture_output=True, check=False, timeout=45)
     if completed.returncode != 0 or not completed.stdout:
         detail = completed.stderr.decode("utf-8", errors="replace").strip()
-        raise RuntimeError(f"Az előnézeti képkocka nem olvasható. {detail[-600:]}")
+        raise RuntimeError(f"Could not read the preview frame. {detail[-600:]}")
     from io import BytesIO
 
     with Image.open(BytesIO(completed.stdout)) as image:

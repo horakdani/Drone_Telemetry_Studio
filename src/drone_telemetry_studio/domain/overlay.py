@@ -5,16 +5,16 @@ from enum import StrEnum
 
 
 class Corner(StrEnum):
-    TOP_LEFT = "Bal felső"
-    TOP_RIGHT = "Jobb felső"
-    BOTTOM_LEFT = "Bal alsó"
-    BOTTOM_RIGHT = "Jobb alsó"
+    TOP_LEFT = "Top left"
+    TOP_RIGHT = "Top right"
+    BOTTOM_LEFT = "Bottom left"
+    BOTTOM_RIGHT = "Bottom right"
 
 
 class MapStyle(StrEnum):
-    DARK = "Sötét"
-    LIGHT = "Világos"
-    CINEMATIC = "Filmes"
+    DARK = "Dark"
+    LIGHT = "Light"
+    CINEMATIC = "Cinematic"
 
 
 @dataclass(slots=True)
@@ -59,7 +59,7 @@ class OverlayConfig:
 @dataclass(slots=True)
 class ExportConfig:
     codec: str = "libx264"
-    quality: str = "Kiegyensúlyozott"
+    quality: str = "Balanced"
     keep_audio: bool = True
     overlay_fps: float = 10.0
     overlay_width: int = 960

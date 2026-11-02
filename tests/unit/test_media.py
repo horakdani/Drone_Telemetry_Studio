@@ -23,7 +23,7 @@ def test_hardware_quality_does_not_use_crf(tmp_path: Path) -> None:
     source = tmp_path / "a.mp4"
     command = build_export_command(
         "ffmpeg", source, tmp_path / "b.mp4", metadata(source),
-        ExportConfig(codec="h264_videotoolbox", quality="Kiváló"),
+        ExportConfig(codec="h264_videotoolbox", quality="High"),
     )
     assert "-b:v" in command
     assert "-crf" not in command

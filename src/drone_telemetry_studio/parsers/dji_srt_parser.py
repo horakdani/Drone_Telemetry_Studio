@@ -26,18 +26,18 @@ _DATE_RE = re.compile(r"\b(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}(?:[.,]\d{1,6})?
 
 
 def parse_timecode(value: str) -> float:
-    """Egyetlen SRT-időkódot alakít másodperccé."""
+    """Converts a single SRT timecode to seconds."""
     match = re.fullmatch(r"\s*(\d{1,3}):(\d{2}):(\d{2})[,.](\d{1,3})\s*", value)
     if not match:
-        raise ValueError(f"Hibás SRT-időkód: {value!r}")
+        raise ValueError(f"Malformed SRT timecode: {value!r}")
     hours, minutes, seconds, millis = (int(part) for part in match.groups())
     if minutes >= 60 or seconds >= 60:
-        raise ValueError(f"Érvénytelen SRT-időkód: {value!r}")
+        raise ValueError(f"Invalid SRT timecode: {value!r}")
     return hours * 3600 + minutes * 60 + seconds + millis / (10 ** len(match.group(4)))
 
 
 def _blocks(stream: TextIO) -> Iterable[list[str]]:
-    """Blokkonként olvas; így nagy SRT-nél sincs szükség a teljes fájl duplázására."""
+    """Reads block by block, so even a large SRT never needs to be held in memory twice."""
     block: list[str] = []
     for raw_line in stream:
         line = raw_line.rstrip("\r\n")
@@ -62,7 +62,7 @@ def _number(values: dict[str, str], key: str, cast: type[float] | type[int] = fl
 
 
 class DjiSrtParser:
-    """Megengedő DJI SRT parser részletes, nem végzetes figyelmeztetésekkel."""
+    """Lenient DJI SRT parser with detailed, non-fatal warnings."""
 
     def parse(self, path: str | Path) -> ParseResult:
         source = Path(path)
@@ -81,11 +81,11 @@ class DjiSrtParser:
                     continue
                 if sample is None:
                     summary.rejected_blocks += 1
-                    warnings.append(ParserWarning(block_no, "A blokk nem tartalmaz felismerhető idősávot."))
+                    warnings.append(ParserWarning(block_no, "The block contains no recognisable time range."))
                     continue
                 if samples and sample.start_time_seconds < samples[-1].start_time_seconds:
                     summary.non_monotonic_timestamps += 1
-                    warnings.append(ParserWarning(block_no, "Az időbélyeg visszafelé lép."))
+                    warnings.append(ParserWarning(block_no, "The timestamp goes backwards."))
                 if not sample.has_valid_gps:
                     summary.invalid_gps_samples += 1
                 if sample.recorded_at is None:
@@ -112,7 +112,7 @@ class DjiSrtParser:
         start = parse_timecode(f"{groups[0]}:{groups[1]}:{groups[2]},{groups[3]}")
         end = parse_timecode(f"{groups[4]}:{groups[5]}:{groups[6]},{groups[7]}")
         if end < start:
-            raise ValueError("Az SRT-blokk záró ideje megelőzi a kezdőidőt.")
+            raise ValueError("The SRT block end time precedes its start time.")
 
         cleaned = "\n".join(_TAG_RE.sub("", line) for line in block)
         frame_match = _FRAME_RE.search(cleaned)
@@ -129,7 +129,7 @@ class DjiSrtParser:
             try:
                 recorded_at = datetime.fromisoformat(normalized)
             except ValueError:
-                warnings.append(ParserWarning(block_no, "A rögzítési dátum nem értelmezhető."))
+                warnings.append(ParserWarning(block_no, "The recording date cannot be parsed."))
 
         latitude = _number(values, "latitude")
         longitude = _number(values, "longitude")
@@ -141,7 +141,7 @@ class DjiSrtParser:
             and not (latitude == 0.0 and longitude == 0.0)
         )
         if not gps_valid and (latitude is not None or longitude is not None):
-            warnings.append(ParserWarning(block_no, "Érvénytelen vagy nullsziget GPS-koordináta."))
+            warnings.append(ParserWarning(block_no, "Invalid or Null Island (0, 0) GPS coordinate."))
 
         flags = ValidityFlag.TIME
         if gps_valid:

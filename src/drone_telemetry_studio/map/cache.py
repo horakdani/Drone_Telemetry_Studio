@@ -12,7 +12,7 @@ from urllib.request import Request, urlopen
 
 @dataclass(slots=True)
 class TileCache:
-    """Feltételes HTTP-kéréseket és legalább hétnapos helyi cache-t biztosít."""
+    """Provides conditional HTTP requests and a local cache of at least seven days."""
 
     root: Path
     minimum_ttl_seconds: int = 7 * 24 * 60 * 60

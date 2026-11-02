@@ -1,2 +1,2 @@
-"""Offline útvonaltérkép és opcionális, cache-elt rasztercsempék."""
+"""Offline route map and optional cached raster tiles."""
 

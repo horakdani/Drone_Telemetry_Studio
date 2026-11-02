@@ -32,7 +32,7 @@ soha nem írja felül, és a videó vagy telemetria nem kerül külső szerverre
 - Haversine-sebesség, simítás, irányszög, magyar égtáj, vertikális sebesség és távolság.
 - Képkockaalapú videóelőnézet, azonnali ±0,01 s telemetria-időeltolás.
 - Fix, teljes útvonalat befoglaló térkép: teljes/eddigi út, kezdőpont, drón és északjel.
-- Alapértelmezett, teljesen offline filmes térkép; opcionális, cache-elt OSM-csempék.
+- Alapértelmezett, cache-elt OpenStreetMap-háttér; kikapcsolható, teljesen offline filmes nézet.
 - Megszakítható, fájlalapú/streaming FFmpeg-export, hangmegtartás és folyamatkijelzés.
 - `libx264`, `libx265`, `h264_videotoolbox` és `hevc_videotoolbox` automatikus felismerése.
 
@@ -93,16 +93,14 @@ utolsó irányt tartja. Minden belső érték SI-mértékegységű.
 
 ## Térkép, hálózat és cache
 
-Az alapértelmezett térkép semmilyen hálózatot nem használ: Web Mercator vetületű,
-filmes útvonalpanelt rajzol, a teljes repülést fix bounding boxban tartja. A képernyőn
-megjelenő útvonal egyszerűsíthető, de az eredeti telemetria nem módosul.
-
-Az **OSM csempés háttér (hálózat)** külön engedélyezhető. Csak az aktuális fix nézethez
-szükséges csempéket kéri, egyedi User-Agenttel, feltételes HTTP-kérésekkel és legalább
+Az alapértelmezett, valódi térképhátteret az OpenStreetMap csempéi adják. Csak az aktuális
+fix nézethez szükséges csempéket kéri, egyedi User-Agenttel, feltételes HTTP-kérésekkel és legalább
 7 napos cache-sel. Nincs terület- vagy zoomszint-előtöltés. A csempe-cache helye:
 `~/Library/Caches/DroneTelemetryStudio/tiles`; a felületről törölhető. A nyilvános
-OSM-szolgáltatásnak nincs SLA-ja, ezért exportnál csak a már cache-elt háttér használható,
-különben az offline háttér jelenik meg. Az attribúció mindig látható.
+OSM-szolgáltatásnak nincs SLA-ja; hálózati hiba esetén az offline háttér jelenik meg.
+A **Valódi OSM-térképháttér (hálózat)** kapcsolóval a csempeletöltés kikapcsolható.
+Az offline nézet Web Mercator vetületű, filmes útvonalpanelt rajzol, és a teljes repülést
+fix bounding boxban tartja. Az attribúció mindig látható.
 
 Lásd az [OSMF Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/)
 és az [OSM attribúciós útmutató](https://osmfoundation.org/wiki/Licence/Attribution_Guidelines)

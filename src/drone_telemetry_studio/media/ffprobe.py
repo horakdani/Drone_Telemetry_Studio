@@ -43,15 +43,15 @@ def probe_video(path: str | Path, ffprobe_path: str | None = None) -> VideoMetad
     ]
     completed = subprocess.run(command, capture_output=True, text=True, check=False, timeout=60)
     if completed.returncode != 0:
-        raise RuntimeError(f"A videó metaadatai nem olvashatók. {completed.stderr.strip()[-800:]}")
+        raise RuntimeError(f"Could not read the video metadata. {completed.stderr.strip()[-800:]}")
     try:
         payload = json.loads(completed.stdout)
     except json.JSONDecodeError as exc:
-        raise RuntimeError("Az FFprobe érvénytelen választ adott.") from exc
+        raise RuntimeError("FFprobe returned an invalid response.") from exc
     streams = payload.get("streams", [])
     video = next((stream for stream in streams if stream.get("codec_type") == "video"), None)
     if video is None:
-        raise RuntimeError("A kiválasztott fájl nem tartalmaz videósávot.")
+        raise RuntimeError("The selected file contains no video stream.")
     audio = next((stream for stream in streams if stream.get("codec_type") == "audio"), None)
     format_data = payload.get("format", {})
     duration = float(video.get("duration") or format_data.get("duration") or 0)
@@ -66,7 +66,7 @@ def probe_video(path: str | Path, ffprobe_path: str | None = None) -> VideoMetad
         height=int(video.get("height") or 0),
         average_fps=average_fps,
         nominal_fps=nominal_fps,
-        codec_name=str(video.get("codec_name") or "ismeretlen"),
+        codec_name=str(video.get("codec_name") or "unknown"),
         pixel_format=video.get("pix_fmt"),
         has_audio=audio is not None,
         audio_codec=audio.get("codec_name") if audio else None,
