@@ -1,8 +1,9 @@
 """Builds the README/website showcase media from a synthetic flight.
 
 Writes a DJI-style SRT for a ~2.4 km flight along the Danube in Budapest, renders a
-stylised background clip with FFmpeg, exports it through the real ExportPipeline
-(with OpenStreetMap tiles) and produces a looping GIF/MP4 plus a still frame.
+procedural dusk flyover clip that moves and climbs with that telemetry
+(scripts/showcase_scene.py), exports it through the real ExportPipeline (with
+OpenStreetMap tiles) and produces a looping GIF/MP4 plus a still frame.
 
     PYTHONPATH=src .venv/bin/python scripts/generate_showcase.py
 
@@ -62,17 +63,27 @@ def _metres(a: tuple[float, float], b: tuple[float, float]) -> float:
     return math.hypot((b[0] - a[0]) * 111_320, (b[1] - a[1]) * 111_320 * math.cos(lat))
 
 
-def write_srt(path: Path) -> None:
+def _progress(t: float) -> float:
+    """Fraction of the route covered at time t: smooth take-off, steady cruise."""
+    u = t / DURATION_S
+    return u * u * (3 - 2 * u) * 0.35 + u * 0.65
+
+
+def _altitude(t: float) -> float:
+    return 35 + 85 * (1 - math.cos(math.pi * min(1.0, t / (DURATION_S * 0.7)))) / 2
+
+
+def _route() -> tuple[list[tuple[float, float]], list[float]]:
     curve = _catmull_rom(WAYPOINTS, 200)
     cumulative = [0.0]
     for a, b in zip(curve, curve[1:]):
         cumulative.append(cumulative[-1] + _metres(a, b))
-    total = cumulative[-1]
+    return curve, cumulative
 
-    def progress(t: float) -> float:
-        # Smooth take-off and arrival, steady cruise in between.
-        u = t / DURATION_S
-        return u * u * (3 - 2 * u) * 0.35 + u * 0.65
+
+def write_srt(path: Path) -> None:
+    curve, cumulative = _route()
+    total = cumulative[-1]
 
     def position(d: float) -> tuple[float, float]:
         for i in range(1, len(cumulative)):
@@ -87,8 +98,8 @@ def write_srt(path: Path) -> None:
     n = int(DURATION_S * SAMPLE_HZ)
     for i in range(n + 1):
         t = i / SAMPLE_HZ
-        lat, lon = position(progress(t) * total)
-        rel_alt = 35 + 85 * (1 - math.cos(math.pi * min(1.0, t / (DURATION_S * 0.7)))) / 2
+        lat, lon = position(_progress(t) * total)
+        rel_alt = _altitude(t)
         stamp = start + timedelta(seconds=t)
         end = t + 1 / SAMPLE_HZ
         blocks.append(
@@ -108,29 +119,33 @@ def _tc(seconds: float) -> str:
     return f"{ms // 3_600_000:02d}:{ms // 60_000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
 
 
-def write_background(ffmpeg: str, path: Path) -> None:
-    """A still dusk-sky gradient with a vignette; static so the GIF stays small."""
-    still = path.with_suffix(".png")
-    subprocess.run(
-        [
-            ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-f", "lavfi", "-i",
-            "gradients=s=1920x1080:n=4:type=linear:speed=0:c0=0x0b1a2e:c1=0x23466b:"
-            "c2=0xb8643e:c3=0xf0b26a:x0=960:y0=0:x1=960:y1=1080",
-            "-vf", "vignette=PI/5", "-frames:v", "1", str(still),
-        ],
-        check=True,
-        timeout=60,
-    )
-    subprocess.run(
+def write_background(ffmpeg: str, path: Path, fps: int = 30) -> None:
+    """Renders the procedural flyover, moving and climbing with the telemetry."""
+    from showcase_scene import AerialScene
+
+    width, height = 1920, 1080
+    scene = AerialScene(width, height)
+    total = _route()[1][-1]
+    process = subprocess.Popen(
         [
             ffmpeg, "-hide_banner", "-loglevel", "error", "-y",
-            "-loop", "1", "-framerate", "30", "-i", str(still), "-t", f"{DURATION_S}",
-            "-c:v", "libx264", "-preset", "veryfast", "-tune", "stillimage", "-crf", "18",
-            "-pix_fmt", "yuv420p", str(path),
+            "-f", "rawvideo", "-pixel_format", "rgb24", "-video_size", f"{width}x{height}",
+            "-framerate", str(fps), "-i", "pipe:0",
+            "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", str(path),
         ],
-        check=True,
-        timeout=900,
+        stdin=subprocess.PIPE,
     )
+    assert process.stdin is not None
+    frames = round(DURATION_S * fps)
+    for index in range(frames):
+        t = index / fps
+        sway = 0.6 * math.sin(t / 6.0) + 0.25 * math.sin(t / 2.3)
+        process.stdin.write(scene.render(_progress(t) * total, _altitude(t), sway).tobytes())
+        if index % (fps * 15) == 0:
+            print(f"background {t:5.0f}/{DURATION_S:.0f} s", flush=True)
+    process.stdin.close()
+    if process.wait() != 0:
+        raise RuntimeError("FFmpeg failed to encode the showcase background")
 
 
 def main() -> None:
@@ -174,9 +189,12 @@ def main() -> None:
     speedup = 8
     subprocess.run(
         [
-            ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", str(exported),
-            "-vf", f"setpts=PTS/{speedup},fps=15,scale=960:-2:flags=lanczos,split[a][b];"
-                   "[a]palettegen=max_colors=256:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle",
+            # The whole frame moves, so the GIF is a ~12 s excerpt kept under ~8 MB for the README.
+            ffmpeg, "-hide_banner", "-loglevel", "error", "-y",
+            "-ss", f"{metadata.duration_seconds * 0.1:.1f}", "-t", f"{metadata.duration_seconds * 0.67:.1f}",
+            "-i", str(exported),
+            "-vf", f"setpts=PTS/{speedup},fps=10,scale=720:-2:flags=lanczos,split[a][b];"
+                   "[a]palettegen=max_colors=96:stats_mode=full[p];[b][p]paletteuse=dither=bayer:bayer_scale=5",
             "-loop", "0", str(images / "demo.gif"),
         ],
         check=True,
