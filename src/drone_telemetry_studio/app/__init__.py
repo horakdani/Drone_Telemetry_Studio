@@ -1,2 +1,2 @@
-"""Alkalmazás-indítás és felhasználói útvonalak."""
+"""Application startup and user data paths."""
 

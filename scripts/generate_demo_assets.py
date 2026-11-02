@@ -54,7 +54,7 @@ def main() -> None:
         metadata,
         samples,
         OverlayConfig(),
-        ExportConfig(codec="libx264", quality="Gyors", overlay_fps=10, overlay_width=640, overlay_height=360),
+        ExportConfig(codec="libx264", quality="Fast", overlay_fps=10, overlay_width=640, overlay_height=360),
     )
     print(preview)
     print(output)

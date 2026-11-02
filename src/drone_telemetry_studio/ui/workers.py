@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class FunctionWorker(QThread):
-    """Egyszeri függvényt futtat, eredményt Qt-jellel visz vissza a fő szálra."""
+    """Runs a one-off function and delivers its result to the main thread via a Qt signal."""
 
     succeeded = Signal(object)
     failed = Signal(str)
@@ -28,8 +28,8 @@ class FunctionWorker(QThread):
     def run(self) -> None:
         try:
             self.succeeded.emit(self.function())
-        except Exception as exc:  # a technikai részlet naplóba, nem párbeszédablakba kerül
-            LOGGER.error("Háttérfeladat sikertelen:\n%s", traceback.format_exc())
+        except Exception as exc:  # technical details go to the log, not to a dialog
+            LOGGER.error("Background task failed:\n%s", traceback.format_exc())
             self.failed.emit(str(exc) or exc.__class__.__name__)
 
 
@@ -73,7 +73,7 @@ class ExportWorker(QThread):
             )
             self.succeeded.emit(result)
         except Exception as exc:
-            LOGGER.error("Export sikertelen:\n%s", traceback.format_exc())
+            LOGGER.error("Export failed:\n%s", traceback.format_exc())
             self.failed.emit(str(exc) or exc.__class__.__name__)
         finally:
             self.pipeline = None

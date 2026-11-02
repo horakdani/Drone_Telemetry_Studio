@@ -129,7 +129,7 @@ class StaticMapRenderer:
         panel = Image.new("RGBA", (max(1, width), max(1, height)), background)
         draw = ImageDraw.Draw(panel, "RGBA")
         if not usable:
-            draw.text((width / 2, height / 2), "Nincs érvényes GPS-adat", fill=(255, 255, 255, 210), font=_font(width // 24), anchor="mm")
+            draw.text((width / 2, height / 2), "No valid GPS data", fill=(255, 255, 255, 210), font=_font(width // 24), anchor="mm")
             return _PreparedMap(key, panel, [], [], [], [], None, done_color, 2)
 
         points = [(sample.latitude, sample.longitude) for sample in usable]  # type: ignore[misc]
@@ -146,8 +146,8 @@ class StaticMapRenderer:
                 draw.line((width * fraction, 0, width * fraction, height), fill=grid, width=1)
                 draw.line((0, height * fraction, width, height * fraction), fill=grid, width=1)
 
-        # A fix háttérhez legfeljebb néhány panelpixelnyi pont kell; a teljes
-        # pontosságú telemetria változatlanul az adatmodellben marad.
+        # The static background needs at most a few points per panel pixel; the
+        # full-precision telemetry stays unchanged in the data model.
         maximum_route_points = max(500, width * 3)
         step = max(1, math.ceil(len(usable) / maximum_route_points))
         route_samples = usable[::step]
@@ -168,10 +168,10 @@ class StaticMapRenderer:
                 (start_x - marker_size, start_y - marker_size, start_x + marker_size, start_y + marker_size),
                 fill=(255, 255, 255, 255), outline=(20, 24, 28, 230), width=max(2, marker_size // 3),
             )
-        draw.text((width - marker_size, marker_size), "É", fill=(255, 255, 255, 235), font=_font(max(11, width // 28)), anchor="ma", stroke_width=1, stroke_fill=(0, 0, 0, 180))
+        draw.text((width - marker_size, marker_size), "N", fill=(255, 255, 255, 235), font=_font(max(11, width // 28)), anchor="ma", stroke_width=1, stroke_fill=(0, 0, 0, 180))
         draw.line((width - marker_size, marker_size * 1.4, width - marker_size, marker_size * 2.5), fill=(255, 255, 255, 230), width=2)
         if config.show_attribution:
-            attribution = config.tile_attribution if config.use_raster_tiles else "Offline útvonal • helyi adatok"
+            attribution = config.tile_attribution if config.use_raster_tiles else "Offline route • local data"
             draw.text((width - 6, height - 5), attribution, fill=(255, 255, 255, 190), font=_font(max(8, width // 48)), anchor="rs", stroke_width=1, stroke_fill=(0, 0, 0, 150))
         return _PreparedMap(
             key,

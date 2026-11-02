@@ -4,7 +4,7 @@ from drone_telemetry_studio.telemetry.geo import (
     bearing_deg,
     enrich_motion,
     haversine_distance_m,
-    hungarian_compass,
+    compass_direction,
 )
 
 
@@ -24,8 +24,8 @@ def test_haversine_and_bearing() -> None:
     assert 110_000 < haversine_distance_m(0, 0, 1, 0) < 112_000
     assert bearing_deg(47, 19, 47.001, 19) == 0.0
     assert 89.0 < bearing_deg(47, 19, 47, 19.001) < 91.0
-    assert [hungarian_compass(value) for value in (0, 45, 90, 135, 180, 225, 270, 315)] == [
-        "É", "ÉK", "K", "DK", "D", "DNy", "Ny", "ÉNy"
+    assert [compass_direction(value) for value in (0, 45, 90, 135, 180, 225, 270, 315)] == [
+        "N", "NE", "E", "SE", "S", "SW", "W", "NW"
     ]
 
 
@@ -40,7 +40,7 @@ def test_speed_distance_vertical_and_outlier_rejection() -> None:
     samples = [
         sample(1, 0.0, 47.0, 19.0, 10.0),
         sample(2, 1.0, 47.000009, 19.0, 11.0),
-        sample(3, 2.0, 48.0, 20.0, 50.0),  # fizikailag lehetetlen kiugrás
+        sample(3, 2.0, 48.0, 20.0, 50.0),  # physically impossible jump
         sample(4, 3.0, 47.000027, 19.0, 13.0),
     ]
     enrich_motion(samples, MotionConfig(speed_window_seconds=0.5, smoothing_time_constant_seconds=0.1))

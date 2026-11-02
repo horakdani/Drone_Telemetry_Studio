@@ -22,7 +22,7 @@ def _lerp_heading(left: float | None, right: float | None, factor: float) -> flo
 
 @dataclass(slots=True)
 class TelemetryTimeline:
-    """Egyszer felépített időindex; export közben O(log n) mintakeresést ad."""
+    """Time index built once; gives O(log n) sample lookup during export."""
 
     samples: list[TelemetrySample]
     _times: list[float] = field(init=False, repr=False)
@@ -125,7 +125,7 @@ def sample_at(
     max_interpolation_gap_seconds: float = 2.0,
     hold_last_on_gap: bool = True,
 ) -> TelemetrySample | None:
-    """Kényelmi egyszeri lekérdezés; ismételt használathoz `TelemetryTimeline` való."""
+    """Convenience one-off lookup; use `TelemetryTimeline` for repeated queries."""
     return TelemetryTimeline(samples).at(
         video_time_seconds,
         offset_seconds=offset_seconds,

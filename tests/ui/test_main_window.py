@@ -9,15 +9,15 @@ from drone_telemetry_studio.app.paths import AppPaths
 from drone_telemetry_studio.ui.main_window import MainWindow
 
 
-def test_main_window_constructs_and_exposes_hungarian_flow(tmp_path: Path) -> None:
+def test_main_window_constructs_and_exposes_english_flow(tmp_path: Path) -> None:
     app = QApplication.instance() or QApplication([])
     paths = AppPaths(tmp_path, tmp_path, tmp_path)
     window = MainWindow(paths, tmp_path / "log.txt")
     window.show()
     app.processEvents()
     assert window.windowTitle() == "Drone Telemetry Studio"
-    assert window.video_button.text() == "Videó kiválasztása…"
-    assert window.export_button.text() == "Export indítása"
+    assert window.video_button.text() == "Choose Video…"
+    assert window.export_button.text() == "Start Export"
     assert window.codec.count() >= 1
     window.close()
 

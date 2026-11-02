@@ -1,2 +1,2 @@
-"""FFmpeg/FFprobe integráció és exportfolyamat."""
+"""FFmpeg/FFprobe integration and export pipeline."""
 

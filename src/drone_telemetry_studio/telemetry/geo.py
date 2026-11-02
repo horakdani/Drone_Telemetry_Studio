@@ -10,7 +10,7 @@ EARTH_RADIUS_M = 6_371_008.8
 
 
 def haversine_distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Nagykör-távolság méterben, rövid drónutakhoz elegendő pontossággal."""
+    """Great-circle distance in metres, accurate enough for short drone flights."""
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     d_phi = math.radians(lat2 - lat1)
     d_lambda = math.radians(lon2 - lon1)
@@ -19,7 +19,7 @@ def haversine_distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> 
 
 
 def bearing_deg(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Kezdő irányszög: észak 0°, kelet 90°, 0–360° tartomány."""
+    """Initial bearing: north 0°, east 90°, range 0–360°."""
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     d_lambda = math.radians(lon2 - lon1)
     y = math.sin(d_lambda) * math.cos(phi2)
@@ -27,10 +27,10 @@ def bearing_deg(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return (math.degrees(math.atan2(y, x)) + 360.0) % 360.0
 
 
-def hungarian_compass(degrees: float | None) -> str:
+def compass_direction(degrees: float | None) -> str:
     if degrees is None:
         return "–"
-    labels = ("É", "ÉK", "K", "DK", "D", "DNy", "Ny", "ÉNy")
+    labels = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
     return labels[int((degrees % 360 + 22.5) // 45) % 8]
 
 
@@ -48,10 +48,10 @@ class MotionConfig:
 def enrich_motion(
     samples: list[TelemetrySample], config: MotionConfig | None = None
 ) -> list[TelemetrySample]:
-    """GPS/altitude értékekből sebességet, irányt és távolságot számít.
+    """Derives speed, heading and distance from GPS/altitude values.
 
-    Az inputot helyben egészíti ki, így több százezer rekordnál sem készít még egy
-    teljes objektumlistát. A nyers és simított sebesség külön mezőben marad.
+    The input is enriched in place, so no second full object list is built even for
+    hundreds of thousands of records. Raw and smoothed speed stay in separate fields.
     """
     cfg = config or MotionConfig()
     accepted_gps: list[TelemetrySample] = []

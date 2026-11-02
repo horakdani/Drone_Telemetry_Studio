@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         splitter.setStretchFactor(1, 1)
         splitter.setSizes([390, 1050])
         self.setCentralWidget(splitter)
-        self.statusBar().showMessage("Készen áll")
+        self.statusBar().showMessage("Ready")
 
     def _settings_area(self) -> QScrollArea:
         body = QWidget()
@@ -106,17 +106,17 @@ class MainWindow(QMainWindow):
         title.setObjectName("appTitle")
         layout.addWidget(title)
 
-        files = QGroupBox("Fájlok")
+        files = QGroupBox("Files")
         files_layout = QVBoxLayout(files)
         self.video_path = QLineEdit()
         self.video_path.setReadOnly(True)
-        self.video_button = QPushButton("Videó kiválasztása…")
+        self.video_button = QPushButton("Choose Video…")
         self.srt_path = QLineEdit()
         self.srt_path.setReadOnly(True)
-        self.srt_button = QPushButton("DJI SRT kiválasztása…")
-        self.auto_pair = QCheckBox("Automatikus párosítás azonos fájlnévvel")
+        self.srt_button = QPushButton("Choose DJI SRT…")
+        self.auto_pair = QCheckBox("Auto-pair files with the same name")
         self.auto_pair.setChecked(True)
-        self.file_info = QLabel("Még nincs betöltött fájl.")
+        self.file_info = QLabel("No file loaded yet.")
         self.file_info.setWordWrap(True)
         self.validation_info = QLabel("")
         self.validation_info.setWordWrap(True)
@@ -124,15 +124,15 @@ class MainWindow(QMainWindow):
             files_layout.addWidget(widget)
         layout.addWidget(files)
 
-        display = QGroupBox("Megjelenítés")
+        display = QGroupBox("Display")
         display_layout = QVBoxLayout(display)
         self.display_checks = {}
         labels_defaults = (
-            ("speed", "Sebesség", True), ("altitude", "Relatív magasság", True),
-            ("gps", "GPS-koordináták", True), ("date", "Dátum", True),
-            ("time", "Idő", True), ("heading", "Irány", True),
-            ("map", "Térkép", True), ("vertical", "Függőleges sebesség", False),
-            ("distance", "Megtett távolság", False),
+            ("speed", "Speed", True), ("altitude", "Relative Altitude", True),
+            ("gps", "GPS Coordinates", True), ("date", "Date", True),
+            ("time", "Time", True), ("heading", "Heading", True),
+            ("map", "Map", True), ("vertical", "Vertical Speed", False),
+            ("distance", "Distance Traveled", False),
         )
         for key, label, checked in labels_defaults:
             checkbox = QCheckBox(label)
@@ -140,12 +140,12 @@ class MainWindow(QMainWindow):
             self.display_checks[key] = checkbox
             display_layout.addWidget(checkbox)
         self.gps_decimals = QComboBox()
-        self.gps_decimals.addItems(["6 tizedes", "5 tizedes", "4 tizedes", "Rejtett"])
-        display_layout.addWidget(QLabel("GPS pontossága"))
+        self.gps_decimals.addItems(["6 decimals", "5 decimals", "4 decimals", "Hidden"])
+        display_layout.addWidget(QLabel("GPS Precision"))
         display_layout.addWidget(self.gps_decimals)
         layout.addWidget(display)
 
-        map_group = QGroupBox("Térkép")
+        map_group = QGroupBox("Map")
         map_form = QFormLayout(map_group)
         self.map_style = QComboBox()
         self.map_style.addItems([item.value for item in MapStyle])
@@ -156,66 +156,66 @@ class MainWindow(QMainWindow):
         self.map_height = QSpinBox(); self.map_height.setRange(15, 55); self.map_height.setValue(25); self.map_height.setSuffix(" %")
         self.map_opacity = QSpinBox(); self.map_opacity.setRange(30, 100); self.map_opacity.setValue(88); self.map_opacity.setSuffix(" %")
         self.route_width = QSpinBox(); self.route_width.setRange(2, 12); self.route_width.setValue(4); self.route_width.setSuffix(" px")
-        self.tile_background = QCheckBox("Valódi OSM-térképháttér (hálózat)")
+        self.tile_background = QCheckBox("OpenStreetMap background (online)")
         self.tile_background.setChecked(True)
-        self.tile_background.setToolTip("Csak az aktuális fix nézet csempéit tölti le, és helyben gyorsítótárazza.")
+        self.tile_background.setToolTip("Downloads only the tiles for the current fixed view and caches them locally.")
         self.hide_start = QDoubleSpinBox(); self.hide_start.setRange(0, 600); self.hide_start.setDecimals(1); self.hide_start.setSuffix(" s")
         self.hide_end = QDoubleSpinBox(); self.hide_end.setRange(0, 600); self.hide_end.setDecimals(1); self.hide_end.setSuffix(" s")
         self.cache_info = QLabel(str(self.paths.cache / "tiles"))
         self.cache_info.setWordWrap(True)
-        self.clear_cache_button = QPushButton("Csempecache törlése")
-        map_form.addRow("Stílus", self.map_style)
-        map_form.addRow("Pozíció", self.map_position)
-        map_form.addRow("Szélesség", self.map_width)
-        map_form.addRow("Magasság", self.map_height)
-        map_form.addRow("Átlátszatlanság", self.map_opacity)
-        map_form.addRow("Útvonalvastagság", self.route_width)
-        map_form.addRow("Kezdő szakasz rejtése", self.hide_start)
-        map_form.addRow("Záró szakasz rejtése", self.hide_end)
+        self.clear_cache_button = QPushButton("Clear Tile Cache")
+        map_form.addRow("Style", self.map_style)
+        map_form.addRow("Position", self.map_position)
+        map_form.addRow("Width", self.map_width)
+        map_form.addRow("Height", self.map_height)
+        map_form.addRow("Opacity", self.map_opacity)
+        map_form.addRow("Route Width", self.route_width)
+        map_form.addRow("Hide Route Start", self.hide_start)
+        map_form.addRow("Hide Route End", self.hide_end)
         map_form.addRow(self.tile_background)
-        map_form.addRow("Cache helye", self.cache_info)
+        map_form.addRow("Cache Location", self.cache_info)
         map_form.addRow(self.clear_cache_button)
         layout.addWidget(map_group)
 
-        sync = QGroupBox("Szinkron és szűrés")
+        sync = QGroupBox("Sync & Filtering")
         sync_form = QFormLayout(sync)
         self.time_offset = QDoubleSpinBox(); self.time_offset.setRange(-600, 600); self.time_offset.setDecimals(2); self.time_offset.setSingleStep(0.01); self.time_offset.setSuffix(" s")
         self.smoothing = QDoubleSpinBox(); self.smoothing.setRange(0.05, 5); self.smoothing.setDecimals(2); self.smoothing.setValue(0.65); self.smoothing.setSuffix(" s")
         self.speed_limit = QDoubleSpinBox(); self.speed_limit.setRange(5, 100); self.speed_limit.setValue(45); self.speed_limit.setSuffix(" m/s")
-        sync_form.addRow("Telemetria-időeltolás", self.time_offset)
-        sync_form.addRow("Simítás időállandója", self.smoothing)
-        sync_form.addRow("GPS-kiugrási határ", self.speed_limit)
+        sync_form.addRow("Telemetry Offset", self.time_offset)
+        sync_form.addRow("Smoothing Time Constant", self.smoothing)
+        sync_form.addRow("GPS Outlier Limit", self.speed_limit)
         layout.addWidget(sync)
 
         export = QGroupBox("Export")
         export_layout = QVBoxLayout(export)
         self.output_path = QLineEdit()
-        self.output_button = QPushButton("Kimeneti MP4…")
+        self.output_button = QPushButton("Choose Output MP4…")
         self.codec = QComboBox()
-        self.quality = QComboBox(); self.quality.addItems(["Gyors", "Kiegyensúlyozott", "Kiváló"]); self.quality.setCurrentText("Kiegyensúlyozott")
-        self.keep_audio = QCheckBox("Hang megtartása"); self.keep_audio.setChecked(True)
+        self.quality = QComboBox(); self.quality.addItems(["Fast", "Balanced", "High"]); self.quality.setCurrentText("Balanced")
+        self.keep_audio = QCheckBox("Keep Audio"); self.keep_audio.setChecked(True)
         export_form = QFormLayout()
-        export_form.addRow("Kimenet", self.output_path)
-        export_form.addRow("Videokodek", self.codec)
-        export_form.addRow("Minőség", self.quality)
+        export_form.addRow("Output", self.output_path)
+        export_form.addRow("Video Codec", self.codec)
+        export_form.addRow("Quality", self.quality)
         export_layout.addLayout(export_form)
         export_layout.addWidget(self.output_button)
         export_layout.addWidget(self.keep_audio)
         buttons = QHBoxLayout()
-        self.export_button = QPushButton("Export indítása")
+        self.export_button = QPushButton("Start Export")
         self.export_button.setObjectName("primaryButton")
-        self.cancel_button = QPushButton("Megszakítás")
+        self.cancel_button = QPushButton("Cancel")
         self.cancel_button.setEnabled(False)
         buttons.addWidget(self.export_button)
         buttons.addWidget(self.cancel_button)
         export_layout.addLayout(buttons)
         self.export_progress = QProgressBar(); self.export_progress.setRange(0, 1000); self.export_progress.setValue(0)
-        self.export_status = QLabel("Nincs folyamatban export.")
+        self.export_status = QLabel("No export in progress.")
         export_layout.addWidget(self.export_progress)
         export_layout.addWidget(self.export_status)
         layout.addWidget(export)
 
-        self.log_button = QPushButton("Napló megnyitása")
+        self.log_button = QPushButton("Open Log")
         layout.addWidget(self.log_button)
         layout.addStretch(1)
 
@@ -231,18 +231,18 @@ class MainWindow(QMainWindow):
         panel = QWidget()
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(20, 20, 20, 20)
-        heading = QLabel("ELŐNÉZET")
+        heading = QLabel("PREVIEW")
         heading.setObjectName("sectionTitle")
         layout.addWidget(heading)
         self.preview = PreviewWidget()
         layout.addWidget(self.preview, 1)
         controls = QHBoxLayout()
-        self.play_button = QPushButton("▶ Lejátszás")
+        self.play_button = QPushButton("▶ Play")
         self.back_button = QPushButton("−1 s")
         self.forward_button = QPushButton("+1 s")
         self.timeline = QSlider(Qt.Orientation.Horizontal)
         self.timeline.setRange(0, 0)
-        self.time_label = QLabel("00:00,00 / 00:00,00")
+        self.time_label = QLabel("00:00.00 / 00:00.00")
         controls.addWidget(self.play_button)
         controls.addWidget(self.back_button)
         controls.addWidget(self.timeline, 1)
@@ -279,7 +279,7 @@ class MainWindow(QMainWindow):
         except RuntimeError as exc:
             self._error(str(exc))
             return
-        options = (("H.264 – szoftveres", "libx264"), ("H.265 – szoftveres", "libx265"), ("H.264 – Apple VideoToolbox", "h264_videotoolbox"), ("H.265 – Apple VideoToolbox", "hevc_videotoolbox"))
+        options = (("H.264 – Software", "libx264"), ("H.265 – Software", "libx265"), ("H.264 – Apple VideoToolbox", "h264_videotoolbox"), ("H.265 – Apple VideoToolbox", "hevc_videotoolbox"))
         for label, codec in options:
             if codec in available:
                 self.codec.addItem(label, codec)
@@ -287,7 +287,7 @@ class MainWindow(QMainWindow):
         self.codec.setCurrentIndex(default_index if default_index >= 0 else 0)
 
     def _select_video(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self, "DJI videó kiválasztása", "", "MP4 videó (*.mp4 *.MP4);;Minden fájl (*)")
+        path, _ = QFileDialog.getOpenFileName(self, "Choose DJI Video", "", "MP4 Video (*.mp4 *.MP4);;All Files (*)")
         if not path:
             return
         self.video_path.setText(path)
@@ -299,24 +299,24 @@ class MainWindow(QMainWindow):
             if pair:
                 self.srt_path.setText(str(pair))
                 self._load_srt(pair)
-        self.statusBar().showMessage("Videó elemzése…")
+        self.statusBar().showMessage("Analyzing video…")
         self._run_worker(lambda: probe_video(path), self._video_loaded)
 
     def _video_loaded(self, metadata: VideoMetadata) -> None:
         self.video_metadata = metadata
         self.timeline.setRange(0, max(0, round(metadata.duration_seconds * 1000)))
         vfr = " • VFR" if metadata.is_variable_frame_rate else ""
-        audio = f" • hang: {metadata.audio_codec}" if metadata.has_audio else " • nincs hang"
+        audio = f" • audio: {metadata.audio_codec}" if metadata.has_audio else " • no audio"
         self.file_info.setText(
             f"{metadata.resolution_label} • {metadata.average_fps:.3f} fps{vfr}\n"
             f"{metadata.duration_seconds:.2f} s • {metadata.codec_name}{audio}"
         )
-        self.statusBar().showMessage("Videó betöltve", 4000)
+        self.statusBar().showMessage("Video loaded", 4000)
         self._update_validation()
         self._schedule_preview()
 
     def _select_srt(self) -> None:
-        path, _ = QFileDialog.getOpenFileName(self, "DJI SRT kiválasztása", "", "SRT telemetria (*.srt *.SRT);;Minden fájl (*)")
+        path, _ = QFileDialog.getOpenFileName(self, "Choose DJI SRT", "", "SRT Telemetry (*.srt *.SRT);;All Files (*)")
         if path:
             self.srt_path.setText(path)
             self._load_srt(Path(path))
@@ -330,7 +330,7 @@ class MainWindow(QMainWindow):
             enrich_motion(result.samples, MotionConfig(smoothing_time_constant_seconds=smoothing, max_speed_mps=max_speed))
             return result
 
-        self.statusBar().showMessage("Telemetria feldolgozása…")
+        self.statusBar().showMessage("Processing telemetry…")
         self._run_worker(work, self._srt_loaded)
 
     def _srt_loaded(self, result: ParseResult) -> None:
@@ -339,15 +339,15 @@ class MainWindow(QMainWindow):
         self.timeline_index = TelemetryTimeline(self.samples)
         status = result.validation
         self.validation_info.setText(
-            f"{status.accepted_samples} minta • {status.duration_seconds:.3f} s • "
-            f"{len(result.warnings)} parserfigyelmeztetés"
+            f"{status.accepted_samples} samples • {status.duration_seconds:.3f} s • "
+            f"{len(result.warnings)} parser warnings"
         )
         if result.warnings:
             self.validation_info.setToolTip(
                 "\n".join(f"#{warning.block_index}: {warning.message}" for warning in result.warnings[:30])
             )
         self._update_validation()
-        self.statusBar().showMessage("Telemetria feldolgozva", 4000)
+        self.statusBar().showMessage("Telemetry processed", 4000)
         self._schedule_preview()
 
     def _reprocess_srt(self) -> None:
@@ -362,17 +362,17 @@ class MainWindow(QMainWindow):
         parser = self.parse_result.validation
         inferred = "" if validation.inferred_telemetry_fps is None else f" • SRT: {validation.inferred_telemetry_fps:.3f} fps"
         summary = (
-            f"{parser.accepted_samples} minta • {parser.duration_seconds:.3f} s • "
-            f"eltérés: {validation.duration_difference_seconds:+.2f} s{inferred}"
+            f"{parser.accepted_samples} samples • {parser.duration_seconds:.3f} s • "
+            f"difference: {validation.duration_difference_seconds:+.2f} s{inferred}"
         )
         if validation.messages:
             summary += "\n⚠ " + "\n⚠ ".join(validation.messages)
         else:
-            summary += "\n✓ A videó és a telemetria idővonala konzisztens."
+            summary += "\n✓ Video and telemetry timelines are consistent."
         self.validation_info.setText(summary)
 
     def _select_output(self) -> None:
-        path, _ = QFileDialog.getSaveFileName(self, "Kimeneti videó", self.output_path.text(), "MP4 videó (*.mp4)")
+        path, _ = QFileDialog.getSaveFileName(self, "Output Video", self.output_path.text(), "MP4 Video (*.mp4)")
         if path:
             if not path.lower().endswith(".mp4"):
                 path += ".mp4"
@@ -386,21 +386,21 @@ class MainWindow(QMainWindow):
     @staticmethod
     def _time(seconds: float) -> str:
         minutes, remainder = divmod(max(0, seconds), 60)
-        return f"{int(minutes):02d}:{remainder:05.2f}".replace(".", ",")
+        return f"{int(minutes):02d}:{remainder:05.2f}"
 
     def _toggle_playback(self) -> None:
         if self.play_timer.isActive():
             self.play_timer.stop()
-            self.play_button.setText("▶ Lejátszás")
+            self.play_button.setText("▶ Play")
         else:
             self.play_timer.start()
-            self.play_button.setText("⏸ Szünet")
+            self.play_button.setText("⏸ Pause")
 
     def _advance_playback(self) -> None:
         value = self.timeline.value() + self.play_timer.interval()
         if value > self.timeline.maximum():
             self.play_timer.stop()
-            self.play_button.setText("▶ Lejátszás")
+            self.play_button.setText("▶ Play")
             value = 0
         self.timeline.setValue(value)
 
@@ -409,8 +409,8 @@ class MainWindow(QMainWindow):
             self.preview_debounce.start()
 
     def _request_preview(self) -> None:
-        # A közvetlen előnézetkérés felülírja a még várakozó debounce-kérést;
-        # különben ugyanarra az állapotra két egymást követő worker indulhat.
+        # A direct preview request supersedes any pending debounced request;
+        # otherwise two consecutive workers could start for the same state.
         if hasattr(self, "preview_debounce"):
             self.preview_debounce.stop()
         if not self.video_metadata or not self.samples:
@@ -422,8 +422,8 @@ class MainWindow(QMainWindow):
         video_path = self.video_metadata.path
         overlay_config = self._overlay_config()
         samples = self.samples
-        # Rejtett/fej nélküli ablakhoz ne indítsunk felesleges hálózati kérést.
-        # A ténylegesen megjelenített előnézet letölti és cache-eli a csempéket.
+        # Avoid needless network requests for a hidden/headless window.
+        # A preview that is actually shown downloads and caches the tiles.
         allow_tiles = overlay_config.map.use_raster_tiles and self.isVisible()
 
         def work():
@@ -435,7 +435,7 @@ class MainWindow(QMainWindow):
             composite.alpha_composite(hud)
             return composite.convert("RGB")
 
-        self.preview.set_message("Előnézet készítése…")
+        self.preview.set_message("Rendering preview…")
         worker = FunctionWorker(work, self)
         self._preview_worker = worker
         worker.succeeded.connect(self._preview_ready)
@@ -460,10 +460,10 @@ class MainWindow(QMainWindow):
         if enabled:
             QMessageBox.information(
                 self,
-                "Térképcsempék és adatvédelem",
-                "Az aktuális térképnézet csempéi az OpenStreetMap szerveréről töltődnek le. "
-                "A videó és az SRT nem kerül feltöltésre, de a csempekérésből a repülés környéke következtethető. "
-                "A csempék legalább 7 napig helyi cache-ben maradnak.",
+                "Map Tiles and Privacy",
+                "Tiles for the current map view are downloaded from the OpenStreetMap servers. "
+                "Your video and SRT file are never uploaded, but the tile requests can reveal the general area of the flight. "
+                "Tiles are kept in a local cache for at least 7 days.",
             )
         self._schedule_preview()
 
@@ -472,12 +472,12 @@ class MainWindow(QMainWindow):
         size_mb = cache.size_bytes() / 1024 / 1024
         answer = QMessageBox.question(
             self,
-            "Csempecache törlése",
-            f"Törlöd a helyi térképcsempe-cache-t ({size_mb:.1f} MB)?",
+            "Clear Tile Cache",
+            f"Clear the local map tile cache ({size_mb:.1f} MB)?",
         )
         if answer == QMessageBox.StandardButton.Yes:
             cache.clear()
-            self.statusBar().showMessage("A térképcsempe-cache törölve.", 4000)
+            self.statusBar().showMessage("Map tile cache cleared.", 4000)
 
     def _overlay_config(self) -> OverlayConfig:
         decimals = (6, 5, 4, 0)[self.gps_decimals.currentIndex()]
@@ -507,18 +507,18 @@ class MainWindow(QMainWindow):
 
     def _start_export(self) -> None:
         if not self.video_metadata or not self.samples:
-            self._error("Előbb válassz videót és feldolgozott SRT-fájlt.")
+            self._error("Choose a video and a processed SRT file first.")
             return
         output = Path(self.output_path.text())
         if not output.name:
-            self._error("Válassz kimeneti MP4-fájlt.")
+            self._error("Choose an output MP4 file.")
             return
         if output.exists():
-            self._error("A kimeneti fájl már létezik. Válassz új nevet; az alkalmazás nem ír felül fájlt.")
+            self._error("The output file already exists. Choose a new name; the app never overwrites files.")
             return
         codec = self.codec.currentData()
         if not codec:
-            self._error("A kiválasztott videokodek nem érhető el ebben az FFmpeg buildben.")
+            self._error("The selected video codec is not available in this FFmpeg build.")
             return
         export_config = ExportConfig(codec=codec, quality=self.quality.currentText(), keep_audio=self.keep_audio.isChecked())
         worker = ExportWorker(
@@ -533,27 +533,27 @@ class MainWindow(QMainWindow):
         self.export_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.export_progress.setValue(0)
-        self.export_status.setText("Export indítása…")
+        self.export_status.setText("Starting export…")
         worker.start()
 
     def _cancel_export(self) -> None:
         if self._export_worker:
-            self.export_status.setText("Megszakítás…")
+            self.export_status.setText("Cancelling…")
             self._export_worker.cancel()
 
     def _export_progressed(self, progress: ExportProgress) -> None:
         self.export_progress.setValue(round(progress.fraction * 1000))
-        remaining = "számítás…" if progress.remaining_seconds is None else self._time(progress.remaining_seconds)
+        remaining = "calculating…" if progress.remaining_seconds is None else self._time(progress.remaining_seconds)
         self.export_status.setText(
-            f"{progress.fraction * 100:.1f}% • eltelt: {self._time(progress.elapsed_seconds)} • hátra: {remaining}"
+            f"{progress.fraction * 100:.1f}% • elapsed: {self._time(progress.elapsed_seconds)} • remaining: {remaining}"
         )
 
     def _export_succeeded(self, result) -> None:
-        self.export_status.setText(f"Kész: {result.output_path.name} ({result.elapsed_seconds:.1f} s)")
-        QMessageBox.information(self, "Export kész", f"A videó elkészült:\n{result.output_path}")
+        self.export_status.setText(f"Done: {result.output_path.name} ({result.elapsed_seconds:.1f} s)")
+        QMessageBox.information(self, "Export Complete", f"The video is ready:\n{result.output_path}")
 
     def _export_failed(self, message: str) -> None:
-        self.export_status.setText("Az export megszakadt vagy hibával leállt.")
+        self.export_status.setText("Export was cancelled or failed.")
         self._error(message)
 
     def _export_finished(self) -> None:
@@ -577,7 +577,7 @@ class MainWindow(QMainWindow):
         worker.deleteLater()
 
     def _worker_error(self, message: str) -> None:
-        self.statusBar().showMessage("Hiba történt")
+        self.statusBar().showMessage("An error occurred")
         self._error(message)
 
     def _error(self, message: str) -> None:
@@ -587,7 +587,7 @@ class MainWindow(QMainWindow):
         self.preview_debounce.stop()
         self.play_timer.stop()
         if self._export_worker and self._export_worker.isRunning():
-            answer = QMessageBox.question(self, "Export folyamatban", "Megszakítod az exportot és bezárod az alkalmazást?")
+            answer = QMessageBox.question(self, "Export in Progress", "Cancel the export and quit the app?")
             if answer != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return

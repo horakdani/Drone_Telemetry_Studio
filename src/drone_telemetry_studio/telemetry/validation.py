@@ -18,15 +18,15 @@ class SyncValidation:
 
 
 def validate_video_telemetry(metadata: VideoMetadata, result: ParseResult) -> SyncValidation:
-    """Az SRT relatív idővonalát és FrameCnt mezőit veti össze az FFprobe-adatokkal."""
+    """Compares the SRT relative timeline and FrameCnt fields with the FFprobe data."""
     duration_difference = result.validation.duration_seconds - metadata.duration_seconds
     messages: list[str] = []
     tolerance = max(0.5, metadata.duration_seconds * 0.01)
     if abs(duration_difference) > tolerance:
-        messages.append(f"A videó és az SRT hossza {duration_difference:+.2f} s eltérést mutat.")
+        messages.append(f"Video and SRT durations differ by {duration_difference:+.2f} s.")
     samples = result.samples
     if samples and abs(samples[0].start_time_seconds) > 0.1:
-        messages.append(f"Az SRT nem 0-nál indul ({samples[0].start_time_seconds:.3f} s).")
+        messages.append(f"The SRT does not start at 0 ({samples[0].start_time_seconds:.3f} s).")
     inferred_fps = None
     framed = [sample for sample in samples if sample.frame_count is not None]
     if len(framed) >= 2:
@@ -36,14 +36,14 @@ def validate_video_telemetry(metadata: VideoMetadata, result: ParseResult) -> Sy
             inferred_fps = delta_frames / delta_time
             if metadata.average_fps > 0 and abs(inferred_fps - metadata.average_fps) / metadata.average_fps > 0.05:
                 messages.append(
-                    f"A FrameCnt alapján {inferred_fps:.3f} fps, a videóban {metadata.average_fps:.3f} fps mérhető."
+                    f"FrameCnt implies {inferred_fps:.3f} fps, but the video measures {metadata.average_fps:.3f} fps."
                 )
         frame_counts = [sample.frame_count for sample in framed]
         if any(right <= left for left, right in zip(frame_counts, frame_counts[1:])):  # type: ignore[operator]
-            messages.append("A FrameCnt értékek nem szigorúan növekvők.")
+            messages.append("FrameCnt values are not strictly increasing.")
     if metadata.is_variable_frame_rate:
-        messages.append("A videó változó képkockasebességű; az export timestamp-alapú.")
+        messages.append("The video has a variable frame rate; export is timestamp-based.")
     if result.validation.non_monotonic_timestamps:
-        messages.append("Az SRT relatív időbélyegei nem monoton növekvők.")
+        messages.append("The SRT relative timestamps are not monotonically increasing.")
     return SyncValidation(duration_difference, inferred_fps, messages)
 

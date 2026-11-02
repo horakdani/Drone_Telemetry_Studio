@@ -1,2 +1,2 @@
-"""Telemetria-számítások és idővonal-interpoláció."""
+"""Telemetry calculations and timeline interpolation."""
 
