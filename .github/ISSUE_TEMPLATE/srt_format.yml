@@ -1,0 +1,24 @@
+name: SRT format support
+description: My drone's SRT file doesn't parse, or fields are missing
+labels: [srt-format]
+body:
+  - type: input
+    id: drone
+    attributes:
+      label: Drone model and firmware
+      placeholder: e.g. DJI Air 3, firmware 10.01.0300
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: First ~20 SRT blocks
+      description: Paste the start of the file. Feel free to shift or round GPS coordinates. Only the format matters.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: What's wrong?
+      description: Parse error, missing altitude, wrong speed, etc.
