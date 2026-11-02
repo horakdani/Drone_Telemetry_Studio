@@ -1,6 +1,0 @@
-Pillow<13,>=12.0
-PySide6<6.11,>=6.10
-
-[dev]
-PyInstaller<7,>=6.16
-pytest<10,>=8.4
